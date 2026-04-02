@@ -19,9 +19,9 @@ jobs:
 
     # Set up Xcode
     - name: Set up Xcode
-      uses: apple-actions/setup-xcode@v2
+      uses: apple-actions/setup-xcode@v3
       with:
-        xcode-version: '14.4'  # You can specify the exact version of Xcode, or use 'macos-latest' for the latest available.
+        xcode-version: '14.4'
 
     # Install dependencies (if any, like brew or others)
     - name: Install dependencies
@@ -34,9 +34,7 @@ jobs:
     # Clean and Build project using xcodebuild
     - name: Build itlwm
       run: |
-        # Clean the build
         xcodebuild clean -project itlwm.xcodeproj -scheme AirportItlwm -configuration Debug -derivedDataPath build
-        # Build the project (adjust scheme as needed)
         xcodebuild -project itlwm.xcodeproj -scheme AirportItlwm -configuration Debug -derivedDataPath build
 
     # Optional: Run tests (if any tests are defined)
@@ -45,14 +43,14 @@ jobs:
         # This is where you would run any tests if they are part of the project
         # You can add any testing commands like `xcodebuild test` here
 
-    # Upload the build artifacts (optional step)
+    # Upload the build artifacts
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: AirportItlwm-build
         path: build/Build/Products/Debug/*.kext  # Path to your built .kext or other output artifacts
 
-    # Generate release notes (optional step)
+    # Generate release notes (optional)
     - name: Generate Release Notes
       run: |
         echo '### Disclaimer:' > ReleaseNotes.md
