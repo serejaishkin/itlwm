@@ -1,27 +1,72 @@
-name: Build itlwm
+name: Build itlwm for macOS 14.4
 
 on:
   push:
+    branches:
+      - master
+  pull_request:
     branches:
       - master
 
 jobs:
   build:
     runs-on: macos-latest
-
+    
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Xcode
-        uses: apple-actions/setup-xcode@v2
-      - name: Install dependencies
-        run: |
-          brew install cmake
-          # Если есть зависимые библиотеки, установите их здесь
-      - name: Build itlwm
-        run: |
-          xcodebuild -scheme AirportItlwm -configuration Debug -derivedDataPath build
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: itlwm-build
-          path: build
+    # Checkout the code from the repository
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Set up Xcode
+    - name: Set up Xcode
+      uses: apple-actions/setup-xcode@v2
+      with:
+        xcode-version: '14.4'  # You can specify the exact version of Xcode, or use 'macos-latest' for the latest available.
+
+    # Install dependencies (if any, like brew or others)
+    - name: Install dependencies
+      run: |
+        brew install cmake
+        brew install libtool
+        brew install autoconf
+        # Add any additional dependencies here if required
+
+    # Clean and Build project using xcodebuild
+    - name: Build itlwm
+      run: |
+        # Clean the build
+        xcodebuild clean -project itlwm.xcodeproj -scheme AirportItlwm -configuration Debug -derivedDataPath build
+        # Build the project (adjust scheme as needed)
+        xcodebuild -project itlwm.xcodeproj -scheme AirportItlwm -configuration Debug -derivedDataPath build
+
+    # Optional: Run tests (if any tests are defined)
+    - name: Run tests (if any)
+      run: |
+        # This is where you would run any tests if they are part of the project
+        # You can add any testing commands like `xcodebuild test` here
+
+    # Upload the build artifacts (optional step)
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: AirportItlwm-build
+        path: build/Build/Products/Debug/*.kext  # Path to your built .kext or other output artifacts
+
+    # Generate release notes (optional step)
+    - name: Generate Release Notes
+      run: |
+        echo '### Disclaimer:' > ReleaseNotes.md
+        echo '***This version is for testing purposes only.***' >> ReleaseNotes.md
+        echo '### Changelog:' >> ReleaseNotes.md
+        git log -n 5 --pretty=format:"- %h: %s" >> ReleaseNotes.md
+        echo '---' >> ReleaseNotes.md
+
+    # Create release on GitHub (optional)
+    - name: Create GitHub release
+      uses: ncipollo/release-action@v1.12.0
+      with:
+        tag: v${{ github.sha }}
+        release-name: "v${{ github.sha }}"
+        bodyFile: ReleaseNotes.md
+        prerelease: true
+        artifacts: ${{ github.workspace }}/build/Build/Products/Debug/*.zip
