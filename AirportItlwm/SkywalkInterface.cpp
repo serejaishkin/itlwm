@@ -1,5 +1,5 @@
-// Updated file for AirportItlwm.hpp under Sequoia/Tahoe macOS.
+// Updated file for SkywalkInterface.cpp under Sequoia/Tahoe macOS.
 // Changes to support macOS 15+ APIs and Skywalk integration.
-// File: AirportItlwm.hpp.
+// File: SkywalkInterface.cpp.
 
 // Insert your updated code here based on the new macOS SDK changes.

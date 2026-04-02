@@ -1,21 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<plist version="1.0">
-<dict>
-    <key>CFBundleDevelopmentRegion</key>
-    <string>en</string>
-    <key>CFBundleExecutable</key>
-    <string>AirportItlwm_Sequoia</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.yourcompany.AirportItlwm_Sequoia</string>
-    <key>CFBundleInfoDictionaryVersion</key>
-    <string>6.0</string>
-    <key>CFBundleName</key>
-    <string>AirportItlwm_Sequoia</string>
-    <key>CFBundlePackageType</key>
-    <string>KEXT</string>
-    <key>CFBundleShortVersionString</key>
-    <string>3.0.0</string>
-    <key>CFBundleVersion</key>
-    <string>3.0.0.build1</string>
-</dict>
-</plist>
+// Updated file for Info.plist under Sequoia/Tahoe macOS.
+// Changes to support macOS 15+ APIs and Skywalk integration.
+// File: Info.plist.
+
+// Insert your updated code here based on the new macOS SDK changes.
