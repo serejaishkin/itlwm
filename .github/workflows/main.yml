@@ -17,11 +17,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    # Set up Xcode
+    # Set up Xcode (replacing the previous deprecated action)
     - name: Set up Xcode
-      uses: apple-actions/setup-xcode@v3
+      uses: apple-actions/setup-xcode@v1
       with:
-        xcode-version: '14.4'
+        xcode-version: '14.4'  # You can specify the exact version of Xcode, or use 'macos-latest' for the latest available.
 
     # Install dependencies (if any, like brew or others)
     - name: Install dependencies
