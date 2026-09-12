@@ -9,6 +9,7 @@ on:
 
 env:
   BUILD_OUTPUT: 'build/Build/Products/Debug'
+  MACOSX_DEPLOYMENT_TARGET: '26.0'
 
 jobs:
   build:
@@ -28,15 +29,15 @@ jobs:
 
     - name: Install MacKernelSDK
       run: |
-        git clone --depth=1 https://github.com/acidanthera/MacKernelSDK.git
+        bash scripts/setup_mackernelsdk.sh
 
     - name: Build itlwm
       run: |
-        xcodebuild -project itlwm.xcodeproj -scheme itlwm -configuration Debug -derivedDataPath build GIT_COMMIT=_${SHORT_SHA}
+        xcodebuild -project itlwm.xcodeproj -scheme itlwm -configuration Debug -derivedDataPath build MACOSX_DEPLOYMENT_TARGET=26.0 GIT_COMMIT=_${SHORT_SHA}
 
     - name: Build AirportItlwm
       run: |
-        xcodebuild -project itlwm.xcodeproj -scheme "AirportItlwm (all)" -configuration Debug -derivedDataPath build GIT_COMMIT=_${SHORT_SHA}
+        xcodebuild -project itlwm.xcodeproj -scheme "AirportItlwm (all)" -configuration Debug -derivedDataPath build MACOSX_DEPLOYMENT_TARGET=26.0 GIT_COMMIT=_${SHORT_SHA}
 
     - name: Pack Artifacts
       run: |
