@@ -30,8 +30,25 @@ build_scheme() {
 # Standard itlwm (Ethernet-style interface).
 build_scheme "itlwm"
 
-# AirportItlwm (IO80211Family-based Wi-Fi interface).
-build_scheme "AirportItlwm (all)"
+# The project does not yet contain a native Tahoe-specific AirportItlwm target.
+# Sonoma 14.4 is the newest existing AirportItlwm target, so reuse its source/build
+# graph while overriding the deployment target and output directory for Tahoe.
+echo
+echo "========================================"
+echo "Building AirportItlwm Tahoe variant..."
+echo "========================================"
+
+TAHOE_PRODUCTS="$DERIVED_DATA/Build/Products/Debug/Tahoe"
+mkdir -p "$TAHOE_PRODUCTS"
+
+xcodebuild \
+    -project itlwm.xcodeproj \
+    -target "AirportItlwm-Sonoma14.4" \
+    -configuration Debug \
+    -derivedDataPath "$DERIVED_DATA" \
+    CONFIGURATION_BUILD_DIR="$TAHOE_PRODUCTS" \
+    MACOSX_DEPLOYMENT_TARGET=26.0 \
+    GIT_COMMIT=_local
 
 echo
 echo "========================================"
