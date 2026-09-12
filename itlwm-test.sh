@@ -7,8 +7,12 @@
 #   bash itlwm-test.sh variants       — + варианты Sequoia (__MAC_15_0) и Tahoe (__MAC_26_0)
 #   bash itlwm-test.sh all            — build + variants за один проход
 #   bash itlwm-test.sh diag [KEXT]    — сбор диагностики (после инъекции kext'а и ребута);
-#                                       если передать KEXT-путь — ещё и попытка загрузки
+#                                       если передать KEXT-путь — ещё и попытка загрузки.
+#                                       Логи пишутся в ./logs/<host>-<os>-<time>, их нужно
+#                                       закоммитить и запушить (скрипт печатает команды).
 #   bash itlwm-test.sh kextutil /path/AirportItlwm.kext — ручная загрузка с подробным логом
+#
+# Собранные kext'ы складываются в ./kexts/. Логи диагностики — в ./logs/.
 #
 # Требования на Mac: полный Xcode (не только Command Line Tools).
 
@@ -22,6 +26,8 @@ TARGET="AirportItlwm-Sonoma14.4"
 ARCH="x86_64"
 DD="build"
 OUT_DIR="kexts"
+REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
+LOG_HOME="$REPO_ROOT/logs"
 
 echo_banner() {
   echo "============================================================================"
@@ -72,7 +78,11 @@ build_variants() {
 }
 
 diag() {
-  local out=~/Desktop/wifi-diag
+  local host osver ts out
+  host="$(scutil --get ComputerName 2>/dev/null || hostname)"
+  osver="$(sw_vers -productVersion 2>/dev/null)"
+  ts="$(date +%Y%m%d-%H%M)"
+  out="$LOG_HOME/${host}-${osver}-${ts}"
   mkdir -p "$out"
 
   echo_banner "Сбор диагностики -> $out"
@@ -106,6 +116,10 @@ diag() {
 
   echo_banner "Готово. Содержимое $out:"
   ls -lh "$out" | awk '{print $9, $5}'
+
+  echo_banner "Отправка логов в репо:"
+  echo "  cd \"$REPO_ROOT\""
+  echo "  git add logs/ && git commit -m \"logs: diag ${host}-${osver}\" && git push origin sequoia-tahoe"
 }
 
 kextutil_load() {
