@@ -90,6 +90,8 @@ diag() {
   uname -a > "$out/uname.txt" 2>&1
   nvram boot-args 2>/dev/null > "$out/boot-args.txt"
   xcodebuild -version > "$out/xcode.txt" 2>&1
+  csrutil status > "$out/csrutil.txt" 2>&1
+  ioreg -lw0 | grep -iE "AppleVTD|IOMapper|VT-d" > "$out/vtd.txt" 2>&1
 
   for k in IO80211Family IOSkywalkFamily IO80211FamilyLegacy IONetworkingFamily IOPCIFamily; do
     echo "== $k ==" >> "$out/frameworks.txt"
@@ -175,7 +177,9 @@ case "$MODE" in
 esac
 
 echo_banner "Готово. Собранные kext'ы в каталоге ./$OUT_DIR"
-echo "Для теста: скопируйте kext в EFI/OC/Kexts/, в config.plist добавьте:"
-echo "  AMFIPass.kext и ваш AirportItlwm-*.kext (ПОСЛЕ него не ставить других сетевых)",
-echo "  csr-active-config = 03080000, при необходимости boot-arg: -lilubetaall"
+echo "Тест в чистой стоковой конфигурации (эталон — BCMC-подход):"
+echo "  - инъекция ТОЛЬКО вашего kext'а (после Lilu, если используется);"
+echo "  - НЕ подкладывать IOSkywalkFamily/IO80211FamilyLegacy, НЕ блокировать системные kext'ы;"
+echo "  - AMFIPass не нужен; csr-active-config можно оставить 00000000 (SIP включён);"
+echo "  - для DMA в стоковом стеке желателен VT-d/AppleVTD."
 echo "После ребута: bash itlwm-test.sh diag"
