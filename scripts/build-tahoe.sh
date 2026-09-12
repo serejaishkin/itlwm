@@ -4,7 +4,8 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT_DIR"
 
-./scripts/setup_mackernelsdk.sh
+# Run through bash so the helper does not require the executable bit.
+bash scripts/setup_mackernelsdk.sh
 
 DERIVED_DATA="$ROOT_DIR/build-tahoe"
 rm -rf "$DERIVED_DATA"
