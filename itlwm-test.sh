@@ -98,6 +98,19 @@ diag() {
   done
 
   sudo kextstat | grep -iE "80211|skywalk|itlw|brcm|airport" > "$out/kextstat.txt"
+
+  # Приватные заголовки и символы сетевого стека — для сверки контракта
+  for k in IOSkywalkFamily IO80211Family; do
+    K="/System/Library/Extensions/$k.kext"
+    [ -d "$K/Contents/Headers" ] && cp -R "$K/Contents/Headers" "$out/headers-$k" 2>/dev/null
+    [ -d "$K/Contents/Resources/Headers" ] && cp -R "$K/Contents/Resources/Headers" "$out/resheaders-$k" 2>/dev/null
+    for b in "$K/Contents/MacOS/$k" "$K/Contents/PlugIns"/*.kext/Contents/MacOS/*; do
+      [ -f "$b" ] && { echo "== $b ==" >> "$out/symbols-$k.txt"; nm -gU "$b" >> "$out/symbols-$k.txt" 2>&1; }
+    done
+  done
+  [ -d "/System/Library/Frameworks/Skywalk.framework" ] && \
+    find "/System/Library/Frameworks/Skywalk.framework" -name "*.h" -exec cp {} "$out/fw-Skywalk-" \;
+
   ifconfig -l > "$out/ifconfig-l.txt"
   ifconfig -a > "$out/ifconfig-a.txt" 2>&1
   ioreg -lw0 | grep -iE "itlw|AirportItlwm|IOPCIDevice.*8086|80211|IOSkywalk" > "$out/ioreg.txt" 2>&1
