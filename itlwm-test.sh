@@ -129,7 +129,7 @@ diag() {
   ioreg -lw0 | grep -iE "itlw|AirportItlwm|IOPCIDevice.*8086|80211|IOSkywalk" > "$out/ioreg.txt" 2>&1
 
   sudo log show --last boot --info --debug \
-    --predicate 'process == "kernel" OR process == "airportd" OR eventMessage CONTAINS[c] "itlw" OR eventMessage CONTAINS[c] "80211" OR eventMessage CONTAINS[c] "skywalk" OR eventMessage CONTAINS[c] "Airport' \
+    --predicate 'process == "kernel" OR process == "airportd" OR eventMessage CONTAINS[c] "itlw" OR eventMessage CONTAINS[c] "80211" OR eventMessage CONTAINS[c] "skywalk" OR eventMessage CONTAINS[c] "Airport"' \
     > "$out/wifi_log.txt" 2>&1
 
   ls -lt /Library/Logs/DiagnosticReports/ 2>/dev/null | grep -i kernel > "$out/panics.txt"
