@@ -39,6 +39,44 @@ static int ieeeChanFlag2appleScanFlagVentura(int flags)
     return ret;
 }
 
+extern "C" boolean_t PE_parse_boot_argn(const char *arg_string, void *arg, int max_size);
+
+#define CONTRACT_PROBE_SLOTS 96
+#define CONTRACT_PROBE_RANGE 0x400000
+
+static bool contractProbeEnabled(void)
+{
+    bool enabled = false;
+    PE_parse_boot_argn("-itlwmcontract", &enabled, sizeof(enabled));
+    return enabled;
+}
+
+// Дампит vtable нашего AirportItlwmSkywalkInterface: каждый слот = адрес
+// виртуального метода. kind=O — адрес лежит в пределах нашего kext (наш
+// оверрайд), kind=. — унаследован из IO80211Family (адрес чужого kext).
+// Через "-itlwmcontract" boot-argv включается только по необходимости.
+// Идея: снять дамп на Sequoia (рабочий) и Tahoe, сравнить индексы kind=O —
+// сдвиг индексов указывает, где контракт IO80211SkywalkInterface разошёлся
+// с компилируемыми заголовками. Сравнение — scripts/analyze-contract.sh.
+void AirportItlwmSkywalkInterface::dumpSkywalkContract(void)
+{
+    void * const *vtable = *reinterpret_cast<void * const * const *>(this);
+    if (vtable == nullptr) {
+        XYLog("CONTRACT no-vtable\n");
+        return;
+    }
+    uintptr_t anchor = (uintptr_t)&contractProbeEnabled;
+    for (uintptr_t i = 0; i < CONTRACT_PROBE_SLOTS; i++) {
+        uintptr_t slot = (uintptr_t)vtable[i];
+        if (slot == 0)
+            break;
+        uintptr_t dist = slot > anchor ? slot - anchor : anchor - slot;
+        XYLog("CONTRACT idx=%llu addr=0x%llx kind=%c\n",
+              (unsigned long long)i, (unsigned long long)slot,
+              dist < CONTRACT_PROBE_RANGE ? 'O' : '.');
+    }
+}
+
 static int ieeeChanFlag2apple(int flags, int bw)
 {
     int ret = 0;
@@ -277,6 +315,8 @@ init(IOService *provider)
         return false;
     this->fHalService = instance->fHalService;
     this->scanSource = instance->scanSource;
+    if (contractProbeEnabled())
+        this->dumpSkywalkContract();
     return ret;
 }
 

@@ -16,6 +16,7 @@ class AirportItlwmSkywalkInterface : public IO80211InfraProtocol {
     
 public:
     virtual bool init(IOService *) override;
+    void dumpSkywalkContract(void);
 //    virtual ifnet_t getBSDInterface(void) override;
     
     void associateSSID(uint8_t *ssid, uint32_t ssid_len, const struct ether_addr &bssid, uint32_t authtype_lower, uint32_t authtype_upper, uint8_t *key, uint32_t key_len, int key_index);
