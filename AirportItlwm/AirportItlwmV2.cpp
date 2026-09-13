@@ -184,9 +184,15 @@ bool AirportItlwm::start(IOService *provider)
     struct IOSkywalkEthernetInterface::RegistrationInfo registInfo;
     int boot_value = 0;
     
+#if __IO80211_TARGET >= __MAC_15_0
+    XYLog("%s skywalk contract: __IO80211_TARGET=0x%x (Sequoia/Tahoe branch)\n", __FUNCTION__, (int)__IO80211_TARGET);
+#else
+    XYLog("%s skywalk contract: __IO80211_TARGET=0x%x (legacy branch)\n", __FUNCTION__, (int)__IO80211_TARGET);
+#endif
     UInt8 builtIn = 0;
     setProperty("built-in", OSData::withBytes(&builtIn, sizeof(builtIn)));
     setProperty("DriverKitDriver", kOSBooleanFalse);
+    setProperty("SkywalkContract", OSNumber::withNumber(__IO80211_TARGET, 32));
     if (!super::start(provider)) {
         return false;
     }

@@ -55,7 +55,7 @@ do_build() {
     -configuration Debug -derivedDataPath "$DD" \
     -only-target "$TARGET" \
     ARCHS="$ARCH" \
-    GCC_PREPROCESSOR_DEFINITIONS="__IO80211_TARGET=$define" \
+    GCC_PREPROCESSOR_DEFINITIONS='$(inherited) AIRPORT __PRIVATE_SPI__ IO80211FAMILY_V2 __IO80211_TARGET='"$define" \
     INFOPLIST_FILE="$plist" \
     CODE_SIGNING_ALLOWED=NO
   local src="$DD/Build/Products/Debug/$TARGET.kext"

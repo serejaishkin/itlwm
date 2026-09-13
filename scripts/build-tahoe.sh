@@ -8,50 +8,59 @@ cd "$ROOT_DIR"
 bash scripts/setup_mackernelsdk.sh
 
 DERIVED_DATA="$ROOT_DIR/build-tahoe"
+PRODUCTS="$DERIVED_DATA/Build/Products/Debug"
+
 rm -rf "$DERIVED_DATA"
 
-build_scheme() {
-    local scheme="$1"
+echo "========================================"
+echo "Building itlwm (standard) for macOS 26 (Tahoe)..."
+echo "========================================"
+
+xcodebuild \
+    -project itlwm.xcodeproj \
+    -scheme itlwm \
+    -configuration Debug \
+    -derivedDataPath "$DERIVED_DATA" \
+    MACOSX_DEPLOYMENT_TARGET=26.0 \
+    GIT_COMMIT=_local
+
+# The project has no native Sequoia/Tahoe AirportItlwm targets yet, so the
+# Sonoma 14.4 source graph (AirportItlwmV2 + AirportItlwmSkywalkInterface,
+# gated on __IO80211_TARGET) is reused and the contract gate is switched via
+# GCC_PREPROCESSOR_DEFINITIONS on the command line.
+#
+# NOTE: a CLI GCC_PREPROCESSOR_DEFINITIONS REPLACES the whole build setting,
+# so every define the target lists must be redeclared: AIRPORT, __PRIVATE_SPI__,
+# IO80211FAMILY_V2 and the __IO80211_TARGET gate itself.
+build_airport_variant() {
+    local label="$1"        # e.g. Tahoe
+    local target_macro="$2" # e.g. __MAC_26_0
+    local deployment="$3"   # e.g. 26.0
+    local infoplist="$4"
 
     echo
     echo "========================================"
-    echo "Building ${scheme} for macOS 26 (Tahoe)..."
+    echo "Building AirportItlwm ${label} (__IO80211_TARGET=${target_macro})..."
     echo "========================================"
 
     xcodebuild \
         -project itlwm.xcodeproj \
-        -scheme "$scheme" \
+        -target "AirportItlwm-Sonoma14.4" \
         -configuration Debug \
         -derivedDataPath "$DERIVED_DATA" \
-        MACOSX_DEPLOYMENT_TARGET=26.0 \
+        CONFIGURATION_BUILD_DIR="$PRODUCTS/$label" \
+        GCC_PREPROCESSOR_DEFINITIONS='$(inherited) AIRPORT __PRIVATE_SPI__ IO80211FAMILY_V2 __IO80211_TARGET='"$target_macro" \
+        INFOPLIST_FILE="$infoplist" \
+        MACOSX_DEPLOYMENT_TARGET="$deployment" \
         GIT_COMMIT=_local
 }
 
-# Standard itlwm (Ethernet-style interface).
-build_scheme "itlwm"
-
-# The project does not yet contain a native Tahoe-specific AirportItlwm target.
-# Sonoma 14.4 is the newest existing AirportItlwm target, so reuse its source/build
-# graph while overriding the deployment target and output directory for Tahoe.
-echo
-echo "========================================"
-echo "Building AirportItlwm Tahoe variant..."
-echo "========================================"
-
-TAHOE_PRODUCTS="$DERIVED_DATA/Build/Products/Debug/Tahoe"
-mkdir -p "$TAHOE_PRODUCTS"
-
-xcodebuild \
-    -project itlwm.xcodeproj \
-    -target "AirportItlwm-Sonoma14.4" \
-    -configuration Debug \
-    -derivedDataPath "$DERIVED_DATA" \
-    CONFIGURATION_BUILD_DIR="$TAHOE_PRODUCTS" \
-    MACOSX_DEPLOYMENT_TARGET=26.0 \
-    GIT_COMMIT=_local
+build_airport_variant "Sonoma14.4" "__MAC_14_4" "10.15" "AirportItlwm/AirportItlwm-Sonoma-Info.plist"
+build_airport_variant "Sequoia" "__MAC_15_0" "15.0" "AirportItlwm/AirportItlwm-Sequoia-Info.plist"
+build_airport_variant "Tahoe" "__MAC_26_0" "26.0" "AirportItlwm/AirportItlwm-Tahoe-Info.plist"
 
 echo
 echo "========================================"
-echo "Tahoe build complete"
+echo "AirportItlwm builds complete"
 echo "========================================"
-find "$DERIVED_DATA/Build/Products" -maxdepth 3 -name '*.kext' -print
+find "$PRODUCTS" -maxdepth 2 -name '*.kext' -print
