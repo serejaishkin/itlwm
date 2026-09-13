@@ -8,7 +8,7 @@ cd "$ROOT_DIR"
 bash scripts/setup_mackernelsdk.sh
 
 DERIVED_DATA="$ROOT_DIR/build-tahoe"
-PRODUCTS="$DERIVED_DATA/Build/Products/Debug"
+PRODUCTS="$DERIVED_DATA/Debug"
 
 rm -rf "$DERIVED_DATA"
 
@@ -20,6 +20,11 @@ rm -rf "$DERIVED_DATA"
 # NOTE: a CLI GCC_PREPROCESSOR_DEFINITIONS REPLACES the whole build setting,
 # so every define the target lists must be redeclared: AIRPORT, __PRIVATE_SPI__,
 # IO80211FAMILY_V2 and the __IO80211_TARGET gate itself.
+#
+# -target builds must NOT be combined with -derivedDataPath on modern Xcode
+# ("-scheme, -testProductsPath, or -xctestrun is required when specifying
+# -derivedDataPath"), so the product location is steered via
+# CONFIGURATION_BUILD_DIR only.
 build_airport_variant() {
     local label="$1"        # e.g. Tahoe
     local target_macro="$2" # e.g. __MAC_26_0
@@ -35,7 +40,6 @@ build_airport_variant() {
         -project itlwm.xcodeproj \
         -target "AirportItlwm-Sonoma14.4" \
         -configuration Debug \
-        -derivedDataPath "$DERIVED_DATA" \
         CONFIGURATION_BUILD_DIR="$PRODUCTS/$label" \
         GCC_PREPROCESSOR_DEFINITIONS='$(inherited) AIRPORT __PRIVATE_SPI__ IO80211FAMILY_V2 __IO80211_TARGET='"$target_macro" \
         INFOPLIST_FILE="$infoplist" \
