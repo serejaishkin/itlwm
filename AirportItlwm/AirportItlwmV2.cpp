@@ -185,14 +185,16 @@ bool AirportItlwm::start(IOService *provider)
     int boot_value = 0;
     
 #if __IO80211_TARGET >= __MAC_15_0
-    XYLog("%s skywalk contract: __IO80211_TARGET=0x%x (Sequoia/Tahoe branch)\n", __FUNCTION__, (int)__IO80211_TARGET);
+#define ITLWM_SKYWALK_CONTRACT_STR "SkywalkContract:15plus"
 #else
-    XYLog("%s skywalk contract: __IO80211_TARGET=0x%x (legacy branch)\n", __FUNCTION__, (int)__IO80211_TARGET);
+#define ITLWM_SKYWALK_CONTRACT_STR "SkywalkContract:14_4"
 #endif
+    XYLog("%s %s (__IO80211_TARGET=0x%x)\n", __FUNCTION__, ITLWM_SKYWALK_CONTRACT_STR, (int)__IO80211_TARGET);
     UInt8 builtIn = 0;
     setProperty("built-in", OSData::withBytes(&builtIn, sizeof(builtIn)));
     setProperty("DriverKitDriver", kOSBooleanFalse);
     setProperty("SkywalkContract", OSNumber::withNumber(__IO80211_TARGET, 32));
+    setProperty("SkywalkContractString", OSString::withCString(ITLWM_SKYWALK_CONTRACT_STR));
     if (!super::start(provider)) {
         return false;
     }

@@ -49,32 +49,42 @@ need_xcode() {
 }
 
 do_build() {
-  local label="$1" define="$2" plist="$3"
-  echo_banner "Сборка: $label  (__IO80211_TARGET=$define)"
+  local label="$1" define="$2" plist="$3" deployment="$4" expect
+  case "$define" in
+    __MAC_15_0|__MAC_26_0) expect="SkywalkContract:15plus" ;;
+    *) expect="SkywalkContract:14_4" ;;
+  esac
+  echo_banner "Сборка: $label  (__IO80211_TARGET=$define, deployment=$deployment,  ожидаем $expect)"
   xcodebuild -project itlwm.xcodeproj -scheme "$SCHEME" \
     -configuration Debug -derivedDataPath "$DD" \
     -only-target "$TARGET" \
     ARCHS="$ARCH" \
     GCC_PREPROCESSOR_DEFINITIONS='$(inherited) AIRPORT __PRIVATE_SPI__ IO80211FAMILY_V2 __IO80211_TARGET='"$define" \
     INFOPLIST_FILE="$plist" \
+    MACOSX_DEPLOYMENT_TARGET="$deployment" \
     CODE_SIGNING_ALLOWED=NO
   local src="$DD/Build/Products/Debug/$TARGET.kext"
   if [ -d "$src" ]; then
     rm -rf "$OUT_DIR/$label.kext"
     cp -R "$src" "$OUT_DIR/$label.kext"
     echo "-> $OUT_DIR/$label.kext"
+    if strings -a "$OUT_DIR/$label.kext/Contents/MacOS/$TARGET" | grep -q "$expect"; then
+      echo "OK: гейт подтверждён ($expect)"
+    else
+      echo "ОШИБКА: в бинарнике нет $expect — гейт __IO80211_TARGET не применился!"
+    fi
   else
     echo "ОШИБКА: kext не собран ($src) — смотрите вывод xcodebuild выше."
   fi
 }
 
 build_baseline() {
-  do_build "AirportItlwm-Sonoma14.4" "__MAC_14_4" "AirportItlwm/AirportItlwm-Sonoma-Info.plist"
+  do_build "AirportItlwm-Sonoma14.4" "__MAC_14_4" "AirportItlwm/AirportItlwm-Sonoma-Info.plist" "10.15"
 }
 
 build_variants() {
-  do_build "AirportItlwm-Sequoia" "__MAC_15_0" "AirportItlwm/AirportItlwm-Sequoia-Info.plist"
-  do_build "AirportItlwm-Tahoe" "__MAC_26_0" "AirportItlwm/AirportItlwm-Tahoe-Info.plist"
+  do_build "AirportItlwm-Sequoia" "__MAC_15_0" "AirportItlwm/AirportItlwm-Sequoia-Info.plist" "15.0"
+  do_build "AirportItlwm-Tahoe" "__MAC_26_0" "AirportItlwm/AirportItlwm-Tahoe-Info.plist" "26.0"
 }
 
 diag() {
@@ -92,6 +102,7 @@ diag() {
   xcodebuild -version > "$out/xcode.txt" 2>&1
   csrutil status > "$out/csrutil.txt" 2>&1
   ioreg -lw0 | grep -iE "AppleVTD|IOMapper|VT-d" > "$out/vtd.txt" 2>&1
+  ioreg -lw0 | grep -iE "SkywalkContract" > "$out/skywalk-contract.txt" 2>&1
 
   for k in IO80211Family IOSkywalkFamily IO80211FamilyLegacy IONetworkingFamily IOPCIFamily; do
     echo "== $k ==" >> "$out/frameworks.txt"
