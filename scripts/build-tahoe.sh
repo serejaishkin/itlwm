@@ -67,3 +67,18 @@ echo "========================================"
 find "$PRODUCTS" -maxdepth 2 -name '*.kext' -print
 echo "-- копии в корне проекта:"
 find "$ROOT_DIR" -maxdepth 1 -name 'AirportItlwm-*.kext' -print
+
+# Выгружаем собранные kext в git-репо (артефакты-версии, чтобы их можно было
+# забрать на любой машине / для OpenCore). Push не фатален: если репо недоступно,
+# kext остаются в корне.
+if [ -d .git ]; then
+    git add AirportItlwm-Sonoma14.4.kext AirportItlwm-Sequoia.kext AirportItlwm-Tahoe.kext 2>/dev/null || true
+    if git diff --cached --quiet; then
+        echo "kext: изменений относительно последнего коммита нет"
+    else
+        git commit -m "kext: AirportItlwm variants ($(date '+%Y-%m-%d %H:%M'))"
+        git push origin HEAD 2>/dev/null || echo "kext: push не удался (офлайн/нет прав) — kext остались локально"
+    fi
+else
+    echo "не git-репо — kext остаются в корне"
+fi

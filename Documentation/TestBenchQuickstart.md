@@ -25,6 +25,29 @@ strings -a build-tahoe/Build/Products/Debug/Tahoe/AirportItlwm.kext/Contents/Mac
 # ожидаем: SkywalkContract:15plus  (Sonoma вариант даёт SkywalkContract:14_4)
 ```
 
+После сборки готовые kext автоматически коммитятся в репо и лягут в корень
+проекта: `AirportItlwm-Sonoma14.4.kext`, `AirportItlwm-Sequoia.kext`,
+`AirportItlwm-Tahoe.kext`.
+
+## 1.5 Добавление kext в OpenCore (что прописывать)
+
+В `EFI/OC/config.plist` → `Kernel` → `Add` — новый элемент:
+
+| Ключ | Значение |
+|------|----------|
+| `BundlePath` | `AirportItlwm-Tahoe.kext` |
+| `ExecutablePath` | `Contents/MacOS/AirportItlwm` |
+| `PlistPath` | `Contents/Info.plist` |
+| `Enabled` | `true` |
+| `MinKernel`/`MaxKernel` | опционально: `26.0.0` / – (привязать к ОС; для Tahoe-варианта логично `MinKernel=15.0.0`+) |
+
+Больше ничего из kext'а вручную прописывать НЕ нужно — но важно:
+- версии зависимостей в `Info.plist` (ключ `OSBundleLibraries`) должны
+  совпадать с версиями `IO80211Family`/`IOSkywalkFamily` на целевой ОС —
+  сейчас в `AirportItlwm-Tahoe-Info.plist` стоит затычка от Sonoma, пока не
+  пришлёте `frameworks.txt` с Tahoe-машины (M6);
+- остальная чистота стенда — см. раздел 2.
+
 ## 2. Чистота стенда (RYZENTOSH)
 
 В EFI/OC **должно быть**:
