@@ -2,6 +2,7 @@
 DerivedData
 build
 build-tahoe
+AirportItlwm-*.kext
 xcuserdata
 project.xcworkspace
 FwBinary.cpp

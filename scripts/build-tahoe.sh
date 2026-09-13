@@ -45,6 +45,15 @@ build_airport_variant() {
         INFOPLIST_FILE="$infoplist" \
         MACOSX_DEPLOYMENT_TARGET="$deployment" \
         GIT_COMMIT=_local
+
+    if [ -d "$PRODUCTS/$label/AirportItlwm.kext" ]; then
+        rm -rf "$ROOT_DIR/AirportItlwm-$label.kext"
+        cp -R "$PRODUCTS/$label/AirportItlwm.kext" "$ROOT_DIR/AirportItlwm-$label.kext"
+        echo "-> $ROOT_DIR/AirportItlwm-$label.kext"
+    else
+        echo "ОШИБКА: kext не собран ($PRODUCTS/$label/AirportItlwm.kext)" >&2
+        exit 1
+    fi
 }
 
 build_airport_variant "Sonoma14.4" "__MAC_14_4" "10.15" "AirportItlwm/AirportItlwm-Sonoma-Info.plist"
@@ -56,3 +65,5 @@ echo "========================================"
 echo "AirportItlwm builds complete"
 echo "========================================"
 find "$PRODUCTS" -maxdepth 2 -name '*.kext' -print
+echo "-- копии в корне проекта:"
+find "$ROOT_DIR" -maxdepth 1 -name 'AirportItlwm-*.kext' -print
