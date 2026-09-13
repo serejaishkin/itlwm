@@ -26,6 +26,7 @@ The repository now includes helpers that install `MacKernelSDK` and build the `i
 cd itlwm
 bash scripts/build-tahoe.sh
 ```
+log show | grep CONTRACT
 
 If you already have a complete `MacKernelSDK` directory, the setup step will reuse it.
 
