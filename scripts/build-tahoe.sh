@@ -12,18 +12,6 @@ PRODUCTS="$DERIVED_DATA/Build/Products/Debug"
 
 rm -rf "$DERIVED_DATA"
 
-echo "========================================"
-echo "Building itlwm (standard) for macOS 26 (Tahoe)..."
-echo "========================================"
-
-xcodebuild \
-    -project itlwm.xcodeproj \
-    -scheme itlwm \
-    -configuration Debug \
-    -derivedDataPath "$DERIVED_DATA" \
-    MACOSX_DEPLOYMENT_TARGET=26.0 \
-    GIT_COMMIT=_local
-
 # The project has no native Sequoia/Tahoe AirportItlwm targets yet, so the
 # Sonoma 14.4 source graph (AirportItlwmV2 + AirportItlwmSkywalkInterface,
 # gated on __IO80211_TARGET) is reused and the contract gate is switched via
