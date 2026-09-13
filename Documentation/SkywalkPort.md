@@ -65,6 +65,20 @@
 - `csrutil.txt`, `vtd.txt` — SIP и VT-d/AppleVTD состояние (чистота стенда).
 - `panics.txt` + `Kernel*.panic` — при панике: стек вызова прямо указывает слот-расхождение.
 
+## Реference: SwiftBeam (старый «мост», попытка №1, не работает)
+
+- Lilu-плагин: спуфинг PCI device-id (`IOPCIDevice::configRead32` → BCM43602 0x43BA14E4)
+  + вариант A: блок `IOSkywalkFamily::start` (legacy-подход, ломает стек);
+  + вариант B: патч `com.apple.driver.AppleBCMWLANCore::checkCapability` → true (молча).
+- Не работает по причинам:
+  1. `AppleBCMWLANCore` отсутствует на Tahoe → символ не резолвится, патч не применяется.
+  2. Спуфинг PCI-config не проходит проверки backplane/SPROM/OTP и требует firmware-загрузки.
+  3. Блок iOSkywalkFamily нарушает сеть (airportd/networkd живут на стеке) и требует legacy-стек (против цели).
+- Вывод: «bridge/companion» здравая идея ТОЛЬКО для чипов, у которых в стеке есть нативный
+  драйвер (Broadcom FullMAC). Для Intel SoftMAC нативного драйвера нет — нужен собственный
+  верхний 80211-слой поверх стокового Skywalk (наш V2-путь).
+- Полезно: мангл `__ZN15IOSkywalkFamily5startEP9IOService` — образец для свери vtable.
+
 ## Открытые вопросы
 
 - Реальный diff vtable `IO80211SkywalkInterface` между Sonoma 14.4 и Sequoia/Tahoe.
