@@ -1,0 +1,1 @@
+   55    3 0xffffff8002973000 0x33ff8    0x33ff8    com.apple.iokit.IOSkywalkFamily (1.0) 50C44C84-1166-387F-8ECE-02E931E2405B <54 53 9 8 7 6 3 1>
