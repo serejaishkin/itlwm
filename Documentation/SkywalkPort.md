@@ -79,6 +79,35 @@
   верхний 80211-слой поверх стокового Skywalk (наш V2-путь).
 - Полезно: мангл `__ZN15IOSkywalkFamily5startEP9IOService` — образец для свери vtable.
 
+## Почему драйвер подключается к IO80211Family, а не напрямую к IOSkywalkFamily
+
+Разбор после первого прогона: AirportItlwm не загружался, возник вопрос «а не
+перейти ли на прямой контакт с IOSkywalkFamily?». Вывод — нет, топология уже
+правильная:
+
+1. **Фактическая цепочка**: `AirportItlwmV2 : IO80211Controller`
+   (класс из `IO80211Family`), интерфейс создаётся самим `IO80211Family` как
+   `IO80211SkywalkInterface : IOSkywalkEthernetInterface : ... : IOSkywalkInterface`
+   (класс `IOSkywalkInterface` — из `IOSkywalkFamily`). Т.е. драйвер уже сидит
+   на IOSkywalkFamily — через 80211-ядро Apple, снизу транспорт skywalk.
+2. **Линковка уже есть**: `OSBundleLibraries` объявляет и
+   `com.apple.iokit.IO80211Family: 1.5.0`, и `com.apple.iokit.IOSkywalkFamily: 1.0`.
+   На стенде присутствуют `1200.13.1` и `1.0` — ограничения удовлетворены
+   (минимумы). Проблема загрузки была не в зависимостях, а в том, что kext
+   вообще отсутствовал в `Kernel/Add` OpenCore (0 строк в логах, 0 записей в
+   `kextstat`).
+3. **Прямой сабкласс `IOSkywalkInterface`** (минуя IO80211Family) дал бы
+   «голый» сетевой интерфейс + DMA-каналы — это путь для **Ethernet-подобных**
+   устройств (именно его использует old-itlwm-Ethernet и BCMC-«Skywalk-only»).
+   Для Wi-Fi это тупик: потеряется 802.11-менеджмент (scan/join/keys/power),
+   personality `airport` (`IONetworkRootType=airport`), связка с airportd и
+   apple80211-ABI. Переписывать это поверх skywalk своими руками = написать
+   заново весь верхний контракт.
+4. **Правильная стратегия** остаётся прежней: `IO80211Controller`/`IO80211InfraProtocol`
+   («верх» из IO80211Family) + фингерпринт vtable (`-itlwmcontract`), чтобы
+   отловить расхождения контракта между ОС, + выравнивание `OSBundleLibraries`
+   по реальным `CFBundleVersion` (`frameworks.txt`).
+
 ## Открытые вопросы
 
 - Реальный diff vtable `IO80211SkywalkInterface` между Sonoma 14.4 и Sequoia/Tahoe.
