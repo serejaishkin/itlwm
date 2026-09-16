@@ -128,6 +128,33 @@ diag() {
   ifconfig -a > "$out/ifconfig-a.txt" 2>&1
   ioreg -lw0 | grep -iE "itlw|AirportItlwm|IOPCIDevice.*8086|80211|IOSkywalk" > "$out/ioreg.txt" 2>&1
 
+  # Состояние OpenCore/EFI: лежит ли kext в EFI/OC/Kexts и согласован ли с Kernel/Add
+  {
+    EFI_DIR=""
+    for v in /Volumes/*; do
+      [ -f "$v/EFI/OC/config.plist" ] && EFI_DIR="$v/EFI"
+    done
+    if [ -z "$EFI_DIR" ]; then
+      echo "EFI не найден (не смонтирован или нестандартный путь) — смонтируйте EFI и повторите diag."
+    else
+      echo "== EFI: $EFI_DIR =="
+      echo "== OC/Kexts: записи itlw/AirportItlwm =="
+      ls -la "$EFI_DIR/OC/Kexts" 2>/dev/null | grep -iE "itlw|airport" || echo "(нет совпадений)"
+      echo "== kernel add: записи itlw/AirportItlwm =="
+      plutil -p "$EFI_DIR/OC/config.plist" 2>/dev/null | grep -iE -B1 -A6 "itlw|airport" || echo "(нет записей)"
+      echo "== сверка BundlePath с реальными файлами =="
+      python3 - "$EFI_DIR/OC/config.plist" <<'PY'
+import plistlib, sys, os
+d = plistlib.load(open(sys.argv[1], 'rb'))
+kexts = os.path.join(os.path.dirname(os.path.dirname(sys.argv[1])), 'OC', 'Kexts')
+for e in d.get('Kernel', {}).get('Add', []):
+    bp = e.get('BundlePath', '') or ''
+    if 'itlw' in bp.lower() or 'airport' in bp.lower():
+        print("%s: Enabled=%s file_exists=%s" % (bp, e.get('Enabled', False), os.path.exists(os.path.join(kexts, bp))))
+PY
+    fi
+  } > "$out/oc.txt" 2>&1
+
   sudo log show --last boot --info --debug \
     --predicate 'process == "kernel" OR process == "airportd" OR eventMessage CONTAINS[c] "itlw" OR eventMessage CONTAINS[c] "80211" OR eventMessage CONTAINS[c] "skywalk" OR eventMessage CONTAINS[c] "Airport"' \
     > "$out/wifi_log.txt" 2>&1
