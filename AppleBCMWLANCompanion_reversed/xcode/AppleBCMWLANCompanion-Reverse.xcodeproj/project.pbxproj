@@ -1,0 +1,42 @@
+// !$*UTF8*$!
+{
+ archiveVersion = 1;
+ classes = { };
+ objectVersion = 56;
+ objects = {
+
+/* Begin PBXFileReference section */
+  AAAAAAAA0000000000000001 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = ../../analysis/README.md; sourceTree = "<group>"; };
+  AAAAAAAA0000000000000002 /* full_x86_64.asm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.asm; path = ../../disassembly/full_x86_64.asm; sourceTree = "<group>"; };
+  AAAAAAAA0000000000000003 /* symbol_table_demangled.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ../../symbols/symbol_table_demangled.txt; sourceTree = "<group>"; };
+  AAAAAAAA0000000000000004 /* interesting_strings.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ../../strings/interesting_strings.txt; sourceTree = "<group>"; };
+  AAAAAAAA0000000000000005 /* key_functions.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ../../analysis/key_functions.txt; sourceTree = "<group>"; };
+  AAAAAAAA0000000000000006 /* AppleBCMWLANCompanion.kext */ = {isa = PBXFileReference; lastKnownFileType = archive; path = ../../binary/AppleBCMWLANCompanion.kext; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+  BBBBBBBB0000000000000001 = {isa = PBXGroup; children = (
+    AAAAAAAA0000000000000001,
+    AAAAAAAA0000000000000002,
+    AAAAAAAA0000000000000003,
+    AAAAAAAA0000000000000004,
+    AAAAAAAA0000000000000005,
+    AAAAAAAA0000000000000006,
+  ); name = "AppleBCMWLANCompanion Reverse"; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+  CCCCCCCC0000000000000001 = {isa = PBXProject; attributes = { LastUpgradeCheck = 1600; ORGANIZATIONNAME = "Reverse Engineering"; TargetAttributes = { }; }; buildConfigurationList = CCCCCCCC0000000000000002; compatibilityVersion = "Xcode 15.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base); mainGroup = BBBBBBBB0000000000000001; productRefGroup = BBBBBBBB0000000000000001; projectDirPath = ""; projectRoot = ""; targets = (); };
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+  DDDDDDDD0000000000000001 = {isa = XCBuildConfiguration; buildSettings = { }; name = Debug; };
+  DDDDDDDD0000000000000002 = {isa = XCBuildConfiguration; buildSettings = { }; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+  CCCCCCCC0000000000000002 = {isa = XCConfigurationList; buildConfigurations = (DDDDDDDD0000000000000001, DDDDDDDD0000000000000002); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+ };
+ rootObject = CCCCCCCC0000000000000001;
+}

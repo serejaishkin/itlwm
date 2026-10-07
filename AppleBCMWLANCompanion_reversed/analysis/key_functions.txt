@@ -1,0 +1,20 @@
+133:00000000000133a0 l     F __TEXT,__text __ZNK28AppleBCMWLANChipConfigurator8resetBusEv.cold.1
+143:000000000001a7c0 l     O __TEXT,__const __ZZNK28AppleBCMWLANChipConfigurator11resetDeviceEvE26kPCIeGen2CoreConfigOffsets
+1375:0000000000003a50      d  *UND* __ZN31AppleBCMWLANChipBackplaneBridge10forcePowerEP25AppleBCMWLANChipBackplanebb
+1379:0000000000003a70      d  *UND* __ZN31AppleBCMWLANChipBackplaneBridge14forcePowerLiteEP25AppleBCMWLANChipBackplanebb
+2153:0000000000005c90      d  *UND* __ZN33AppleBCMWLANChipManagerPCIeBridge28setM2MResetOnSSResetDisabledEP27AppleBCMWLANChipManagerPCIeb
+2157:0000000000005cc0      d  *UND* __ZN33AppleBCMWLANChipManagerPCIeBridge23setPowerControlRequiredEP27AppleBCMWLANChipManagerPCIeb
+2556:0000000000008f60      d  *UND* __ZNK28AppleBCMWLANChipConfigurator16resetCorePrivateERK14CoreDescriptor
+2560:0000000000009000      d  *UND* __ZNK28AppleBCMWLANChipConfigurator9resetCoreERK14CoreDescriptorjjj
+2620:0000000000009f00      d  *UND* __ZNK28AppleBCMWLANChipConfigurator11resetDeviceEv
+2624:000000000000a0a0      d  *UND* __ZNK28AppleBCMWLANChipConfigurator8resetBusEv
+2716:00000000000133a0      d  *UND* __ZNK28AppleBCMWLANChipConfigurator8resetBusEv.cold.1
+2723:000000000001a7c0      d  *UND* __ZZNK28AppleBCMWLANChipConfigurator11resetDeviceEvE26kPCIeGen2CoreConfigOffsets
+5026:0000000000003a50 g     F __TEXT,__text __ZN31AppleBCMWLANChipBackplaneBridge10forcePowerEP25AppleBCMWLANChipBackplanebb
+5033:0000000000003a70 g     F __TEXT,__text __ZN31AppleBCMWLANChipBackplaneBridge14forcePowerLiteEP25AppleBCMWLANChipBackplanebb
+5380:0000000000005cc0 g     F __TEXT,__text __ZN33AppleBCMWLANChipManagerPCIeBridge23setPowerControlRequiredEP27AppleBCMWLANChipManagerPCIeb
+5397:0000000000005c90 g     F __TEXT,__text __ZN33AppleBCMWLANChipManagerPCIeBridge28setM2MResetOnSSResetDisabledEP27AppleBCMWLANChipManagerPCIeb
+5702:0000000000009f00 g     F __TEXT,__text __ZNK28AppleBCMWLANChipConfigurator11resetDeviceEv
+5711:0000000000008f60 g     F __TEXT,__text __ZNK28AppleBCMWLANChipConfigurator16resetCorePrivateERK14CoreDescriptor
+5725:000000000000a0a0 g     F __TEXT,__text __ZNK28AppleBCMWLANChipConfigurator8resetBusEv
+5727:0000000000009000 g     F __TEXT,__text __ZNK28AppleBCMWLANChipConfigurator9resetCoreERK14CoreDescriptorjjj
