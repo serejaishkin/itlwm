@@ -22,10 +22,17 @@ Plan to adapt AirportItlwm from legacy iOS80211Interface to modern Skywalk stack
 
 ---
 
-## Phase 1: IOCTL Parity Inventory (1-2 days) — IN PROGRESS
+## Phase 1: IOCTL Parity Inventory (1-2 days) — ✓ COMPLETED
 
 ### Goal
 Map every get/set IOCTL from legacy AirportItlwm.cpp → current AirportItlwmSkywalkInterface.cpp, identify gaps blocking airportd/wifid startup.
+
+### Actions Completed
+1. ✓ Created comprehensive parity table (20+ methods, 3 categories)
+2. ✓ Implemented `getHW_SUPPORTED_CHANNELS` — delegates to `getSUPPORTED_CHANNELS`, enables airportd band detection
+3. ✓ Implemented `setPOWERSAVE` setter — accepts calls, logs for debugging, returns success
+4. ✓ Verified `getDEAUTH` / `setDEAUTH` / `setDISASSOCIATE` — all implemented
+5. ✓ Commit: `33a8fa1` Phase 1 IOCTL handlers
 
 ### V1 → V2 IOCTL Mapping Table
 
@@ -79,19 +86,19 @@ Map every get/set IOCTL from legacy AirportItlwm.cpp → current AirportItlwmSky
 Fix mismatch between Sequoia and Tahoe vtable layouts for `IO80211SkywalkInterface` and related Apple base classes.
 
 ### Current Issue
-- `AirportItlwmV2.cpp` line ~304: **double `initRegistrationInfo()` call**
-- Direct dereference of `mExpansionData` without NULL checks
-- Both allocation patterns unsafe; second call overwrites first redundantly
+- `AirportItlwmV2.cpp` line ~304: ✓ **FIXED** — double `initRegistrationInfo()` call removed
+- Direct dereference of `mExpansionData` — ✓ **FIXED** — NULL checks added
+- Both allocation patterns — ✓ **FIXED** — safe allocation with proper cleanup on failure
 
 ### Root Cause
 Skywalk base class layout changed between Sequoia and Tahoe; field offsets shifted. Headers available to this project are incomplete/inconsistent.
 
-### Solution
-1. ✓ **Remove duplicate** `initRegistrationInfo()` (line 308)
+### Solution Implemented
+1. ✓ **Remove duplicate** `initRegistrationInfo()` (original line 308)
 2. ✓ **Add NULL checks** on `mExpansionData` / `mExpansionData2`
 3. ✓ **Safe allocation** pattern: allocate to temp vars, check both succeeded, assign to pointers
 4. ✓ **Proper cleanup** on partial failure: free both if either allocation fails
-5. **Verify with** `-itlwmcontract` logging that vtable contract matches after fix
+5. ✓ Commit: `61400b1` — Fix Skywalk registration bootstrap
 
 ### Testing command
 ```bash
@@ -100,7 +107,12 @@ log stream --level debug --predicate 'process == "kernel" && message contains "S
 # Should NOT show vtable shift warnings
 ```
 
-**Status:** Implemented in commit `61400b1`.
+### Still TODO (if issues persist)
+- Sniff CONTRACT on Sequoia (working baseline) and Tahoe with `-itlwmcontract` boot-arg
+- Run `scripts/analyze-contract.sh` to compare vtable slot mappings
+- If slots differ: update header offsets in `include/Airport/IO80211SkywalkInterface.h` or apply patch offset in code
+
+**Status:** Bootstrap memory-safety fixed; await Tahoe testing to confirm no vtable crashes.
 
 ---
 
@@ -263,5 +275,80 @@ Copying `.cpp` would create dead code + name collisions. Pattern reuse = documen
 
 ---
 
+## Completed Work Summary
+
+### Commits in this session
+1. **`61400b1`** — Fix Skywalk registration bootstrap
+   - Remove duplicate `initRegistrationInfo()` call
+   - Add NULL checks for `mExpansionData` / `mExpansionData2`
+   - Safe IOMalloc pattern with proper cleanup on failure
+   - Prevents use-after-free / double-free vulnerabilities
+
+2. **`206bf0c`** — Add comprehensive Skywalk porting plan
+   - Phases 0-6 documented with success criteria
+   - IOCTL parity table (20+ methods): Status, gaps, actions
+   - Architecture notes (where NOT to copy BCMC)
+
+3. **`33a8fa1`** — Phase 1: Implement missing IOCTL handlers
+   - `getHW_SUPPORTED_CHANNELS` — enables airportd band detection
+   - `setPOWERSAVE` setter — accepts power profile changes
+   - Critical gaps from Phase 1 closure
+
+---
+
+## Next Steps by Phase
+
+### Phase 2: Tahoe Contract (If persistent vtable issues)
+**When to do:** After Tahoe testing shows crashes in `fNetIf->start(this)` or attachment failures.
+- Run `log stream` with `-itlwmcontract` boot-arg on Tahoe
+- Capture vtable signatures with `scripts/analyze-contract.sh`
+- Compare against Sequoia baseline
+- If offsets differ: apply patch or update header offsets
+
+### Phase 3: Datapath (Weeks, can run in parallel with 1-2)
+**Goal:** Skywalk Tx/Rx queues with bounce buffer when no IOMapper.
+**Sketch:** Create `AirportItlwm/skywalk/` with:
+- `ItlSkywalkPacketPool` — pre-allocated ring
+- `ItlSkywalkTxSubmissionQueue` — dequeue Skywalk → fill Intel Tx
+- `ItlSkywalkRxCompletionQueue` — enqueue to Skywalk
+- `ItlSkywalkMemorySegment` — IOMapper / bounce logic
+
+### Phase 4: Control plane (After Phase 3 basics)
+**Goal:** Ensure same state machine as V1.
+- Scan cache clear handler (`setSCANCACHE_CLEAR`)
+- Verify deauth sequence in `setDISASSOCIATE`
+- Test: scan → assoc → DHCP → ping → disassoc
+
+### Phase 5: AWDL stubs (Low priority, mostly done)
+**Goal:** Don't crash on AWDL ioctl, return `kIOReturnUnsupported`.
+
+### Phase 6: Build & Regression (Final)
+**Targets:** Sequoia 14.0, 14.4, Tahoe 15.x
+**Regression:** Load, scan, WPA2/WPA3, DHCP, sleep/wake, VT-d toggle
+
+---
+
+## For Tahoe Testing
+
+1. **Prepare:**
+   - Transfer to macOS Tahoe machine with Xcode
+   - Build: `xcodebuild -scheme AirportItlwm -configuration Release`
+   
+2. **Install & test with logging enabled:**
+   ```bash
+   sudo kextload build/Release/AirportItlwm.kext
+   log stream --level debug --predicate 'eventMessage contains "AirportItlwm"'
+   ```
+   
+3. **Capture vtable signature (if Phase 2 needed):**
+   ```bash
+   log stream -o contract.log --level debug -p "kernel" &
+   sudo nvram boot-args="-v -itlwmcontract"
+   sudo reboot
+   # After boot: bash scripts/analyze-contract.sh contract.log
+   ```
+
+---
+
 ## Next Step
-Start Phase 1: Run `grep -r "getPOWERSAVE\|getHW_SUPPORTED_CHANNELS\|setDEAUTH" AirportItlwm/*.cpp` and implement missing setters.
+Start Phase 3 (if Phase 2 tests OK) or run Phase 2 diagnostics (if vtable crashes occur). For now, proceed with documentation and staging Phase 3 skeleton.
