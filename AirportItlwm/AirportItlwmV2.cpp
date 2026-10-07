@@ -308,14 +308,28 @@ bool AirportItlwm::start(IOService *provider)
         releaseAll();
         return false;
     }
-    if (!fNetIf->initRegistrationInfo(&registInfo, 1, sizeof(registInfo))) {
-        XYLog("initRegistrationInfo fail\n");
+    
+    if (!fNetIf->mExpansionData || !fNetIf->mExpansionData2) {
+        XYLog("Expansion data not initialized\n");
         super::stop(provider);
         releaseAll();
         return false;
     }
-    fNetIf->mExpansionData->fRegistrationInfo = (struct IOSkywalkNetworkInterface::RegistrationInfo *)IOMalloc(sizeof(struct IOSkywalkNetworkInterface::RegistrationInfo));
-    fNetIf->mExpansionData2->fRegistrationInfo = (struct IOSkywalkEthernetInterface::RegistrationInfo *)IOMalloc(sizeof(struct IOSkywalkEthernetInterface::RegistrationInfo));
+    
+    void *regInfo1 = IOMalloc(sizeof(struct IOSkywalkNetworkInterface::RegistrationInfo));
+    void *regInfo2 = IOMalloc(sizeof(struct IOSkywalkEthernetInterface::RegistrationInfo));
+    
+    if (!regInfo1 || !regInfo2) {
+        if (regInfo1) IOFree(regInfo1, sizeof(struct IOSkywalkNetworkInterface::RegistrationInfo));
+        if (regInfo2) IOFree(regInfo2, sizeof(struct IOSkywalkEthernetInterface::RegistrationInfo));
+        XYLog("Registration info allocation failed\n");
+        super::stop(provider);
+        releaseAll();
+        return false;
+    }
+    
+    fNetIf->mExpansionData->fRegistrationInfo = (struct IOSkywalkNetworkInterface::RegistrationInfo *)regInfo1;
+    fNetIf->mExpansionData2->fRegistrationInfo = (struct IOSkywalkEthernetInterface::RegistrationInfo *)regInfo2;
     memcpy(fNetIf->mExpansionData->fRegistrationInfo, &registInfo, sizeof(registInfo));
     memcpy(fNetIf->mExpansionData2->fRegistrationInfo, &registInfo, sizeof(registInfo));
     if (fNetIf->getInterfaceRole() == 1)
