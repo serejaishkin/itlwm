@@ -80,7 +80,7 @@ public:
     virtual IOReturn getAWDL_RSDB_CAPS(apple80211_rsdb_capability *) override { return kIOReturnUnsupported; }
     virtual IOReturn getTKO_PARAMS(apple80211_tko_params *) override { return kIOReturnUnsupported; }
     virtual IOReturn getTKO_DUMP(apple80211_tko_dump *) override { return kIOReturnUnsupported; }
-    virtual IOReturn getHW_SUPPORTED_CHANNELS(apple80211_sup_channel_data *) override { return kIOReturnUnsupported; }
+    virtual IOReturn getHW_SUPPORTED_CHANNELS(apple80211_sup_channel_data *) override;
     virtual IOReturn getBTCOEX_PROFILE(apple80211_btcoex_profile *) override { return kIOReturnUnsupported; }
     virtual IOReturn getBTCOEX_PROFILE_ACTIVE(apple80211_btcoex_profile_active_data *) override { return kIOReturnUnsupported; }
     virtual IOReturn getTRAP_INFO(apple80211_trap_info_data *) override { return kIOReturnUnsupported; }
@@ -142,7 +142,7 @@ public:
     virtual IOReturn setAUTH_TYPE(apple80211_authtype_data *) override;
     virtual IOReturn setCIPHER_KEY(apple80211_key *) override;
     virtual IOReturn setCHANNEL(apple80211_channel_data *) override { return kIOReturnUnsupported; }
-    virtual IOReturn setPOWERSAVE(apple80211_powersave_data *) override { return kIOReturnUnsupported; }
+    virtual IOReturn setPOWERSAVE(apple80211_powersave_data *) override;
     virtual IOReturn setTXPOWER(apple80211_txpower_data *) override { return kIOReturnUnsupported; }
     virtual IOReturn setRATE(apple80211_rate_data *) override { return kIOReturnUnsupported; }
     virtual IOReturn setSCAN_REQ(apple80211_scan_data *) override;

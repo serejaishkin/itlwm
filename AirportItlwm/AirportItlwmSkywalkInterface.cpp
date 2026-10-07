@@ -758,6 +758,15 @@ getPOWERSAVE(struct apple80211_powersave_data *pd)
 }
 
 IOReturn AirportItlwmSkywalkInterface::
+setPOWERSAVE(struct apple80211_powersave_data *pd)
+{
+    if (!pd)
+        return kIOReturnError;
+    XYLog("%s: powersave_level=%d\n", __FUNCTION__, pd->powersave_level);
+    return kIOReturnSuccess;
+}
+
+IOReturn AirportItlwmSkywalkInterface::
 getNSS(struct apple80211_nss_data *data)
 {
     memset(data, 0, sizeof(*data));
@@ -851,6 +860,12 @@ getSUPPORTED_CHANNELS(struct apple80211_sup_channel_data *ad)
         }
     }
     return kIOReturnSuccess;
+}
+
+IOReturn AirportItlwmSkywalkInterface::
+getHW_SUPPORTED_CHANNELS(struct apple80211_sup_channel_data *ad)
+{
+    return getSUPPORTED_CHANNELS(ad);
 }
 
 IOReturn AirportItlwmSkywalkInterface::
