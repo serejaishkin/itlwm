@@ -5,6 +5,7 @@
 
 #include "ItlSkywalkPacketPool.hpp"
 #include <libkern/libkern.h>
+#include <IOKit/IOLib.h>
 
 #define super IOSkywalkPacketBufferPool
 OSDefineMetaClassAndStructors(ItlSkywalkPacketPool, IOSkywalkPacketBufferPool);

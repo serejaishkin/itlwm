@@ -5,6 +5,7 @@
 
 #include "ItlSkywalkRxCompletionQueue.hpp"
 #include <libkern/libkern.h>
+#include <IOKit/IOLib.h>
 
 #define super IOSkywalkPacketQueue
 OSDefineMetaClassAndStructors(ItlSkywalkRxCompletionQueue, IOSkywalkPacketQueue);
