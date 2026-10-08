@@ -1,75 +1,50 @@
 # Phase 3: Skywalk Datapath Skeleton
 
-This directory contains headers for Phase 3 (Skywalk datapath implementation).
+This directory contains the Phase 3 Skywalk datapath skeleton, refactored to the
+4-queue contract recovered from AppleBCMWLANCompanion (reference only, no BCM code).
 
 ## Files
 
-- **ItlSkywalkPacketPool.{hpp,cpp}** — Packet pool and ring allocation
-  - Pre-allocate fixed-size DMA-friendly buffers
-  - Reuse descriptors across Tx/Rx cycles
-  - Inspired by BCMC `AppleBCMWLANPCIeSkywalkPacketPool` pattern
+- **ItlSkywalkTxSubmissionQueue.{hpp,cpp}** — `IOSkywalkPacketQueue` subclass.
+  Kernel fills Tx packet buffers; `willDequeuePackets`/`dequeuePackets` hand them
+  to the Intel Tx HAL.
 
-- **ItlSkywalkTxQueue.{hpp,cpp}** — Skywalk → Intel Tx ring adapter
-  - Dequeue packet from Skywalk submission queue
-  - Map to Intel Tx descriptor(s)
-  - Trigger DMA, monitor completion
+- **ItlSkywalkTxCompletionQueue.{hpp,cpp}** — `IOSkywalkPacketQueue` subclass.
+  Kernel returns transmitted packets via `stagePacket`, frees buffer back to pool.
 
-- **ItlSkywalkRxQueue.{hpp,cpp}** — Intel Rx ring → Skywalk adapter
-  - Allocate/bounce-buffer frame from Intel Rx ring
-  - Enqueue to Skywalk completion queue
-  - Release descriptor back to Intel pool
+- **ItlSkywalkRxSubmissionQueue.{hpp,cpp}** — `IOSkywalkPacketQueue` subclass.
+  Kernel fills Rx buffers; driver hands them to the Intel Rx ring for DMA.
 
-- **ItlSkywalkMemorySegment.{hpp,cpp}** — IOMapper abstraction
-  - Use IOMapper if available (VT-d enabled)
-  - Fall back to bounce buffer if no IOMMU
-  - Hide BCMC-specific DART mapping (we're Intel)
+- **ItlSkywalkRxCompletionQueue.{hpp,cpp}** — `IOSkywalkPacketQueue` subclass.
+  Driver returns received frames via `stagePacket`.
 
-## MVP Goals
+- **ItlSkywalkPacketPool.{hpp,cpp}** — `IOSkywalkPacketBufferPool` subclass.
+  Real Skywalk packet allocation from the pool, bounce fallback when no IOMapper.
 
-1. Load kext on Sequoia/Tahoe (Phase 1-2 already done)
-2. Scan and list networks (Phase 1 IOCTL done)
-3. Associate to WPA2/WPA3 network
-4. DHCP and ping through Skywalk Tx/Rx
-5. Sleep/wake and reconnect
+- **ItlSkywalkMemorySegment.{hpp,cpp}** — `IOSkywalkMemorySegment` subclass.
+  DMA segment wrapper; mapping on Phase 4.
 
-## Not Included (Post-MVP)
+## Contract (from BCMC reversal, Apple only)
 
-- AWDL/P2P queues
-- HMAP power saving
-- Multi-band/RSDB
-- Virtual interfaces
-- Ranging, NAN, 6 GHz
-
-## Design Notes
-
-**DO NOT copy Broadcom code:**
-- BCMC handles BCM hardware (backplane, EROM, SROM, Cortex-R4)
-- Intel path: iwx firmware → Tx/Rx descriptors → Skywalk bridge
-
-**Key pattern from BCMC (reference only):**
-```
-Skywalk packet ring (pre-allocated, DMA-friendly)
-    ↓
-Submission queue (enqueue Intel packet, trigger ring)
-    ↓
-Completion queue (dequeue finished, call packet->complete())
-```
-
-**Intel-specific adaptation:**
-- hwqueue (iwx Tx ring) = Intel descriptor array, not Apple CCPipe
-- Bounce buffer only when IOMapper unavailable (BCMC always has it)
-- No DART, no M2M reset, no chip reset (that's HAL's job)
+- Submission side: `willDequeuePackets(IOSkywalkPacket**, uint32_t)`,
+  `dequeuePackets(OSObject*, IO80211NetworkPacket**, uint32_t, void*)`
+- Completion side: `stagePacket(IO80211NetworkPacket*, bool, bool)` (Rx),
+  `stagePacket(IOSkywalkPacket*, bool, bool)` (Tx)
+- Register 4 queues via
+  `IOSkywalkEthernetInterface::registerEthernetInterface(&registInfo, queues, count,
+  txPool, rxPool, capacity)` — exact order fixed on `-itlwmcontract`.
 
 ## Status
 
-- Headers: Written
-- Implementation (.cpp): Stubs only, TODO markers throughout
-- Integration: Pending connection to AirportItlwmV2.cpp start()
+- Headers/Implementation: stubs, TODO markers throughout
+- Xcode: `skywalk/*.{hpp,cpp}` added to targets AirportItlwm-Sonoma14.0 and
+  AirportItlwm-Sonoma14.4
+- Integration: pending connection to AirportItlwmV2.cpp start()
 
 ## Next Phase
 
-After Phase 3 is outlined and stubs compile:
-1. Implement packet pool alloc/free via IOSkywalkFamily APIs
-2. Wire Tx: Skywalk → hwqueue descriptor fill
-3. Wire Rx: hwqueue → Skywalk completion enqueue
-4. Test: ping through Skywalk rings (with logging)
+1. Compile skeleton on MacBook
+2. CONTRACT fingerprint per-OS to confirm queue/order and vtable
+3. Wire Tx: Skywalk submission → hwqueue descriptor fill
+4. Wire Rx: hwqueue → Skywalk completion enqueue
+5. Test: ping through Skywalk rings (with logging)

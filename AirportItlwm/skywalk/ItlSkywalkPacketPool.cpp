@@ -2,87 +2,70 @@
 //  ItlSkywalkPacketPool.cpp
 //  AirportItlwm-Skywalk
 //
-//  Packet pool implementation.
-//  MVP: Allocate fixed-size pre-mapped DMA ring, reuse descriptors.
-//
 
 #include "ItlSkywalkPacketPool.hpp"
-#include <libkern/c++/OSDynamicCast.h>
+#include <libkern/libkern.h>
 
-#define super OSObject
-OSDefineMetaClassAndStructors(ItlSkywalkPacketPool, OSObject);
+#define super IOSkywalkPacketBufferPool
+OSDefineMetaClassAndStructors(ItlSkywalkPacketPool, IOSkywalkPacketBufferPool);
 
-ItlSkywalkPacketPool::ItlSkywalkPacketPool()
-    : capacity_(0), bufferPool_(nullptr), bounceBuffers_(nullptr)
+ItlSkywalkPacketPool *ItlSkywalkPacketPool::create(const char *name, OSObject *owner,
+                                                   uint32_t capacity, uint32_t maxBuffersPerPacket,
+                                                   uint32_t bufferSize)
 {
+    ItlSkywalkPacketPool *pool = new ItlSkywalkPacketPool;
+    if (!pool)
+        return nullptr;
+
+    IOSkywalkPacketBufferPool::PoolOptions options = {};
+    options.packetCount = capacity;
+    options.bufferCount = capacity * maxBuffersPerPacket;
+    options.bufferSize = bufferSize;
+    options.maxBuffersPerPacket = maxBuffersPerPacket;
+    options.memorySegmentSize = 0;
+    options.poolFlags = 0;
+
+    if (!pool->initWithName(name, owner, 0, &options)) {
+        pool->release();
+        return nullptr;
+    }
+
+    return pool;
 }
 
-ItlSkywalkPacketPool::~ItlSkywalkPacketPool()
+bool ItlSkywalkPacketPool::initWithName(const char *name, OSObject *owner, uint featureFlags,
+                                        IOSkywalkPacketBufferPool::PoolOptions const *options)
 {
-    free();
-}
-
-bool ItlSkywalkPacketPool::init(uint32_t capacity)
-{
-    if (!super::init())
+    if (!super::initWithName(name, owner, featureFlags, options))
         return false;
-    
-    capacity_ = capacity;
-    
-    // TODO: Allocate IOSkywalkPacketBufferPool via IOSkywalkFamily
-    // For now, just log capability.
-    // XYLog("%s: Allocating packet pool for %u packets\n", __FUNCTION__, capacity);
-    
+
+    if (options) {
+        capacity_ = options->packetCount;
+        bufferSize_ = options->bufferSize;
+    }
+
+    IOLog("%s: <%s> capacity %u bufferSize %u\n", __FUNCTION__, name, capacity_, bufferSize_);
+
+    // TODO(phase3): после CONTRACT-фингерпринта заменить делегирование
+    //      реальной реализацией IOSkywalkFamily (find/attach IOSkywalkFamily).
+
     return true;
 }
 
 void ItlSkywalkPacketPool::free()
 {
-    if (bufferPool_) {
-        // TODO: Release bufferPool_
-        bufferPool_ = nullptr;
-    }
-    
-    if (bounceBuffers_) {
-        // TODO: Release bounce buffers
-        bounceBuffers_ = nullptr;
-    }
-    
+    IOLog("%s: freeing pool\n", __FUNCTION__);
+
     super::free();
 }
 
-IOSkywalkPacket *ItlSkywalkPacketPool::allocatePacket(uint32_t size)
+bool ItlSkywalkPacketPool::allocatePacket(IOSkywalkPacket **packet, uint size)
 {
-    if (!bufferPool_)
-        return nullptr;
-    
-    // TODO: Get packet from bufferPool_, return to caller
-    return nullptr;
+    // TODO(phase3): обёртка вокруг буферов пула + bounce при отсутствии IOMapper.
+    return false;
 }
 
-void ItlSkywalkPacketPool::freePacket(IOSkywalkPacket *pkt)
+void ItlSkywalkPacketPool::deallocatePacket(IOSkywalkPacket *packet)
 {
-    if (!pkt || !bufferPool_)
-        return;
-    
-    // TODO: Return packet to pool
-}
-
-void *ItlSkywalkPacketPool::allocateBounceBuffer(uint32_t size, uint32_t &physicalAddress)
-{
-    // TODO: Allocate buffer, get physical address via IOMapper if available,
-    // else return virtual address (will DMA via IOMMU if available)
-    physicalAddress = 0;
-    return nullptr;
-}
-
-void ItlSkywalkPacketPool::freeBounceBuffer(void *buffer, uint32_t size)
-{
-    // TODO: Free bounce buffer
-}
-
-uint32_t ItlSkywalkPacketPool::getAvailable() const
-{
-    // TODO: Query bufferPool_ for available packets
-    return capacity_;
+    // TODO(phase3): вернуть буфер в пул.
 }

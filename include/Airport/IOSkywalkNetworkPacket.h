@@ -6,8 +6,8 @@
 //  Copyright © 2023 钟先耀. All rights reserved.
 //
 
-#ifndef IOSkywalkInterface_h
-#define IOSkywalkInterface_h
+#ifndef IOSkywalkNetworkPacket_h
+#define IOSkywalkNetworkPacket_h
 
 class IOSkywalkPacketBufferPool;
 class IOSkywalkPacketDescriptor;

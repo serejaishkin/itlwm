@@ -4,46 +4,48 @@
 //
 
 #include "ItlSkywalkMemorySegment.hpp"
+#include <libkern/libkern.h>
 
-ItlSkywalkMemorySegment::ItlSkywalkMemorySegment()
-    : mapper_(nullptr)
-{
-}
+#define super IOSkywalkMemorySegment
+OSDefineMetaClassAndStructors(ItlSkywalkMemorySegment, IOSkywalkMemorySegment);
 
-ItlSkywalkMemorySegment::~ItlSkywalkMemorySegment()
+ItlSkywalkMemorySegment *ItlSkywalkMemorySegment::withDescriptor(IOMemoryDescriptor *descriptor)
 {
-    free();
-}
+    if (!descriptor)
+        return nullptr;
 
-bool ItlSkywalkMemorySegment::init(void *mapper)
-{
-    mapper_ = mapper;
-    
-    // TODO: Detect IOMapper from IO80211SkywalkInterface
-    // If mapper available: use for Tx/Rx buffers
-    // If not: allocate bounce buffers (as in BCMC processPacketNoMapper)
-    
-    return true;
+    ItlSkywalkMemorySegment *seg = new ItlSkywalkMemorySegment;
+    if (!seg)
+        return nullptr;
+
+    seg->descriptor_ = descriptor;
+    seg->length_ = descriptor->getLength();
+    descriptor->retain();
+
+    return seg;
 }
 
 void ItlSkywalkMemorySegment::free()
 {
-    mapper_ = nullptr;
+    if (descriptor_) {
+        descriptor_->release();
+        descriptor_ = nullptr;
+    }
+
+    super::free();
 }
 
-bool ItlSkywalkMemorySegment::mapBuffer(void *virtualAddress, uint32_t size, uint32_t &dmaAddress)
+void ItlSkywalkMemorySegment::complete(uint32_t status)
 {
-    if (!virtualAddress || size == 0)
-        return false;
-    
-    // TODO: If hasMapper(), use mapper_->mapMemoryDescriptor()
-    // TODO: Else, return virtualAddress as-is (IOMMU will handle, or bounce buffer alloc)
-    
-    dmaAddress = 0;
-    return true;
+    // TODO(phase4): сигнал завершения DMA над сегментом.
 }
 
-void ItlSkywalkMemorySegment::unmapBuffer(uint32_t dmaAddress, uint32_t size)
+IOMemoryDescriptor *ItlSkywalkMemorySegment::getMemoryDescriptor(void)
 {
-    // TODO: If hasMapper(), call mapper_->unmapMemoryDescriptor()
+    return descriptor_;
+}
+
+uint32_t ItlSkywalkMemorySegment::getLength(void)
+{
+    return length_;
 }

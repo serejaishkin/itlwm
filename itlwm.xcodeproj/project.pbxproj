@@ -991,6 +991,30 @@
 		F8F92586240974EF0088B8D5 /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = F8F9257B240974EF0088B8D5 /* types.h */; };
 		F8F9EDE1240B7415009CB8E7 /* _task.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F8F9EDE0240B7415009CB8E7 /* _task.cpp */; };
 		F8FA0EEC2501E7EE00B1822E /* zutil.h in Headers */ = {isa = PBXBuildFile; fileRef = F8FA0EEB2501E7EE00B1822E /* zutil.h */; };
+DE47C100000000000000001 /* ItlSkywalkTxSubmissionQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE47BA100000000000000001 /* ItlSkywalkTxSubmissionQueue.cpp */; };
+		DE47C100000000000000002 /* ItlSkywalkTxCompletionQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE47BA100000000000000002 /* ItlSkywalkTxCompletionQueue.cpp */; };
+		DE47C100000000000000003 /* ItlSkywalkRxSubmissionQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE47BA100000000000000003 /* ItlSkywalkRxSubmissionQueue.cpp */; };
+		DE47C100000000000000004 /* ItlSkywalkRxCompletionQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE47BA100000000000000004 /* ItlSkywalkRxCompletionQueue.cpp */; };
+		DE47C100000000000000005 /* ItlSkywalkPacketPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE47BA100000000000000005 /* ItlSkywalkPacketPool.cpp */; };
+		DE47C100000000000000006 /* ItlSkywalkMemorySegment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE47BA100000000000000006 /* ItlSkywalkMemorySegment.cpp */; };
+		DE47C200000000000000001 /* ItlSkywalkTxSubmissionQueue.hpp in Headers */ = {isa = PBXBuildFile; fileRef = DE47BB100000000000000001 /* ItlSkywalkTxSubmissionQueue.hpp */; };
+		DE47C200000000000000002 /* ItlSkywalkTxCompletionQueue.hpp in Headers */ = {isa = PBXBuildFile; fileRef = DE47BB100000000000000002 /* ItlSkywalkTxCompletionQueue.hpp */; };
+		DE47C200000000000000003 /* ItlSkywalkRxSubmissionQueue.hpp in Headers */ = {isa = PBXBuildFile; fileRef = DE47BB100000000000000003 /* ItlSkywalkRxSubmissionQueue.hpp */; };
+		DE47C200000000000000004 /* ItlSkywalkRxCompletionQueue.hpp in Headers */ = {isa = PBXBuildFile; fileRef = DE47BB100000000000000004 /* ItlSkywalkRxCompletionQueue.hpp */; };
+		DE47C200000000000000005 /* ItlSkywalkPacketPool.hpp in Headers */ = {isa = PBXBuildFile; fileRef = DE47BB100000000000000005 /* ItlSkywalkPacketPool.hpp */; };
+		DE47C200000000000000006 /* ItlSkywalkMemorySegment.hpp in Headers */ = {isa = PBXBuildFile; fileRef = DE47BB100000000000000006 /* ItlSkywalkMemorySegment.hpp */; };
+		DE47C300000000000000001 /* ItlSkywalkTxSubmissionQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE47BA100000000000000001 /* ItlSkywalkTxSubmissionQueue.cpp */; };
+		DE47C300000000000000002 /* ItlSkywalkTxCompletionQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE47BA100000000000000002 /* ItlSkywalkTxCompletionQueue.cpp */; };
+		DE47C300000000000000003 /* ItlSkywalkRxSubmissionQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE47BA100000000000000003 /* ItlSkywalkRxSubmissionQueue.cpp */; };
+		DE47C300000000000000004 /* ItlSkywalkRxCompletionQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE47BA100000000000000004 /* ItlSkywalkRxCompletionQueue.cpp */; };
+		DE47C300000000000000005 /* ItlSkywalkPacketPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE47BA100000000000000005 /* ItlSkywalkPacketPool.cpp */; };
+		DE47C300000000000000006 /* ItlSkywalkMemorySegment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE47BA100000000000000006 /* ItlSkywalkMemorySegment.cpp */; };
+		DE47C400000000000000001 /* ItlSkywalkTxSubmissionQueue.hpp in Headers */ = {isa = PBXBuildFile; fileRef = DE47BB100000000000000001 /* ItlSkywalkTxSubmissionQueue.hpp */; };
+		DE47C400000000000000002 /* ItlSkywalkTxCompletionQueue.hpp in Headers */ = {isa = PBXBuildFile; fileRef = DE47BB100000000000000002 /* ItlSkywalkTxCompletionQueue.hpp */; };
+		DE47C400000000000000003 /* ItlSkywalkRxSubmissionQueue.hpp in Headers */ = {isa = PBXBuildFile; fileRef = DE47BB100000000000000003 /* ItlSkywalkRxSubmissionQueue.hpp */; };
+		DE47C400000000000000004 /* ItlSkywalkRxCompletionQueue.hpp in Headers */ = {isa = PBXBuildFile; fileRef = DE47BB100000000000000004 /* ItlSkywalkRxCompletionQueue.hpp */; };
+		DE47C400000000000000005 /* ItlSkywalkPacketPool.hpp in Headers */ = {isa = PBXBuildFile; fileRef = DE47BB100000000000000005 /* ItlSkywalkPacketPool.hpp */; };
+		DE47C400000000000000006 /* ItlSkywalkMemorySegment.hpp in Headers */ = {isa = PBXBuildFile; fileRef = DE47BB100000000000000006 /* ItlSkywalkMemorySegment.hpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1305,6 +1329,18 @@
 		F8F9EDE0240B7415009CB8E7 /* _task.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = _task.cpp; sourceTree = "<group>"; };
 		F8FA0EEB2501E7EE00B1822E /* zutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = zutil.h; sourceTree = "<group>"; };
 		F8FA0EED2501E8C100B1822E /* zutil.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = zutil.c; sourceTree = "<group>"; };
+DE47BA100000000000000001 /* ItlSkywalkTxSubmissionQueue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ItlSkywalkTxSubmissionQueue.cpp; sourceTree = "<group>"; };
+		DE47BA100000000000000002 /* ItlSkywalkTxCompletionQueue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ItlSkywalkTxCompletionQueue.cpp; sourceTree = "<group>"; };
+		DE47BA100000000000000003 /* ItlSkywalkRxSubmissionQueue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ItlSkywalkRxSubmissionQueue.cpp; sourceTree = "<group>"; };
+		DE47BA100000000000000004 /* ItlSkywalkRxCompletionQueue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ItlSkywalkRxCompletionQueue.cpp; sourceTree = "<group>"; };
+		DE47BA100000000000000005 /* ItlSkywalkPacketPool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ItlSkywalkPacketPool.cpp; sourceTree = "<group>"; };
+		DE47BA100000000000000006 /* ItlSkywalkMemorySegment.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ItlSkywalkMemorySegment.cpp; sourceTree = "<group>"; };
+		DE47BB100000000000000001 /* ItlSkywalkTxSubmissionQueue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ItlSkywalkTxSubmissionQueue.hpp; sourceTree = "<group>"; };
+		DE47BB100000000000000002 /* ItlSkywalkTxCompletionQueue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ItlSkywalkTxCompletionQueue.hpp; sourceTree = "<group>"; };
+		DE47BB100000000000000003 /* ItlSkywalkRxSubmissionQueue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ItlSkywalkRxSubmissionQueue.hpp; sourceTree = "<group>"; };
+		DE47BB100000000000000004 /* ItlSkywalkRxCompletionQueue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ItlSkywalkRxCompletionQueue.hpp; sourceTree = "<group>"; };
+		DE47BB100000000000000005 /* ItlSkywalkPacketPool.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ItlSkywalkPacketPool.hpp; sourceTree = "<group>"; };
+		DE47BB100000000000000006 /* ItlSkywalkMemorySegment.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ItlSkywalkMemorySegment.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1618,6 +1654,7 @@
 				F8A028712A4A7FE100C6DE90 /* AirportItlwmSkywalkInterface.hpp */,
 				F8A0287D2A4A80EA00C6DE90 /* IOPCIEDeviceWrapper.cpp */,
 				F8A0287E2A4A80EA00C6DE90 /* IOPCIEDeviceWrapper.hpp */,
+				DE47B1000000000000000001 /* skywalk */,
 			);
 			path = AirportItlwm;
 			sourceTree = "<group>";
@@ -1776,6 +1813,25 @@
 				F8F9257B240974EF0088B8D5 /* types.h */,
 			);
 			path = linux;
+			sourceTree = "<group>";
+		};
+DE47B1000000000000000001 /* skywalk */ = {
+			isa = PBXGroup;
+			children = (
+				DE47BB100000000000000001 /* ItlSkywalkTxSubmissionQueue.hpp */,
+				DE47BB100000000000000002 /* ItlSkywalkTxCompletionQueue.hpp */,
+				DE47BB100000000000000003 /* ItlSkywalkRxSubmissionQueue.hpp */,
+				DE47BB100000000000000004 /* ItlSkywalkRxCompletionQueue.hpp */,
+				DE47BB100000000000000005 /* ItlSkywalkPacketPool.hpp */,
+				DE47BB100000000000000006 /* ItlSkywalkMemorySegment.hpp */,
+				DE47BA100000000000000001 /* ItlSkywalkTxSubmissionQueue.cpp */,
+				DE47BA100000000000000002 /* ItlSkywalkTxCompletionQueue.cpp */,
+				DE47BA100000000000000003 /* ItlSkywalkRxSubmissionQueue.cpp */,
+				DE47BA100000000000000004 /* ItlSkywalkRxCompletionQueue.cpp */,
+				DE47BA100000000000000005 /* ItlSkywalkPacketPool.cpp */,
+				DE47BA100000000000000006 /* ItlSkywalkMemorySegment.cpp */,
+			);
+			path = skywalk;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2088,6 +2144,12 @@
 				F84AD8CB2A497DB200DC8DED /* IOSkywalkPacketBufferPool.h in Headers */,
 				F84AD8D22A497DB200DC8DED /* IOSkywalkLegacyEthernetInterface.h in Headers */,
 				F8B210B12A2EC2680043ECBD /* AirportItlwmInterface.hpp in Headers */,
+				DE47C200000000000000001 /* ItlSkywalkTxSubmissionQueue.hpp in Headers */,
+				DE47C200000000000000002 /* ItlSkywalkTxCompletionQueue.hpp in Headers */,
+				DE47C200000000000000003 /* ItlSkywalkRxSubmissionQueue.hpp in Headers */,
+				DE47C200000000000000004 /* ItlSkywalkRxCompletionQueue.hpp in Headers */,
+				DE47C200000000000000005 /* ItlSkywalkPacketPool.hpp in Headers */,
+				DE47C200000000000000006 /* ItlSkywalkMemorySegment.hpp in Headers */,
 				F8B210B22A2EC2680043ECBD /* IO80211Interface.h in Headers */,
 				F84AD88C2A497DB200DC8DED /* IO80211WorkQueue.h in Headers */,
 				F8B210B32A2EC2680043ECBD /* (null) in Headers */,
@@ -2128,6 +2190,12 @@
 				F8D94C912B9ABFE20081A3C4 /* IOSkywalkPacketBufferPool.h in Headers */,
 				F8D94C922B9ABFE20081A3C4 /* IOSkywalkLegacyEthernetInterface.h in Headers */,
 				F8D94C932B9ABFE20081A3C4 /* AirportItlwmInterface.hpp in Headers */,
+				DE47C400000000000000001 /* ItlSkywalkTxSubmissionQueue.hpp in Headers */,
+				DE47C400000000000000002 /* ItlSkywalkTxCompletionQueue.hpp in Headers */,
+				DE47C400000000000000003 /* ItlSkywalkRxSubmissionQueue.hpp in Headers */,
+				DE47C400000000000000004 /* ItlSkywalkRxCompletionQueue.hpp in Headers */,
+				DE47C400000000000000005 /* ItlSkywalkPacketPool.hpp in Headers */,
+				DE47C400000000000000006 /* ItlSkywalkMemorySegment.hpp in Headers */,
 				F8D94C942B9ABFE20081A3C4 /* IO80211Interface.h in Headers */,
 				F8D94C952B9ABFE20081A3C4 /* IO80211WorkQueue.h in Headers */,
 				F8D94C962B9ABFE20081A3C4 /* (null) in Headers */,
@@ -3118,6 +3186,12 @@
 				F8B210FD2A2EC2680043ECBD /* power.cpp in Sources */,
 				F8B210FE2A2EC2680043ECBD /* scan.cpp in Sources */,
 				F8A0287F2A4A80EA00C6DE90 /* IOPCIEDeviceWrapper.cpp in Sources */,
+				DE47C100000000000000001 /* ItlSkywalkTxSubmissionQueue.cpp in Sources */,
+				DE47C100000000000000002 /* ItlSkywalkTxCompletionQueue.cpp in Sources */,
+				DE47C100000000000000003 /* ItlSkywalkRxSubmissionQueue.cpp in Sources */,
+				DE47C100000000000000004 /* ItlSkywalkRxCompletionQueue.cpp in Sources */,
+				DE47C100000000000000005 /* ItlSkywalkPacketPool.cpp in Sources */,
+				DE47C100000000000000006 /* ItlSkywalkMemorySegment.cpp in Sources */,
 				F8B210FF2A2EC2680043ECBD /* ItlIwm.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3198,6 +3272,12 @@
 				F8D94CEB2B9ABFE20081A3C4 /* power.cpp in Sources */,
 				F8D94CEC2B9ABFE20081A3C4 /* scan.cpp in Sources */,
 				F8D94CED2B9ABFE20081A3C4 /* IOPCIEDeviceWrapper.cpp in Sources */,
+				DE47C300000000000000001 /* ItlSkywalkTxSubmissionQueue.cpp in Sources */,
+				DE47C300000000000000002 /* ItlSkywalkTxCompletionQueue.cpp in Sources */,
+				DE47C300000000000000003 /* ItlSkywalkRxSubmissionQueue.cpp in Sources */,
+				DE47C300000000000000004 /* ItlSkywalkRxCompletionQueue.cpp in Sources */,
+				DE47C300000000000000005 /* ItlSkywalkPacketPool.cpp in Sources */,
+				DE47C300000000000000006 /* ItlSkywalkMemorySegment.cpp in Sources */,
 				F8D94CEE2B9ABFE20081A3C4 /* ItlIwm.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

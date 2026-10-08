@@ -2,33 +2,31 @@
 //  ItlSkywalkMemorySegment.hpp
 //  AirportItlwm-Skywalk
 //
-//  Memory segment abstraction: IOMapper-aware DMA mapping or bounce buffer fallback.
+//  Сегмент памяти для DMA: субкласс IOSkywalkMemorySegment. Скелет —
+//  IOMapper-маппинг или bounce fallback, реальный маппинг на фазе 4.
 //
 
 #ifndef ItlSkywalkMemorySegment_hpp
 #define ItlSkywalkMemorySegment_hpp
 
-#include <IOKit/IOTypes.h>
+#include <Airport/IOSkywalkMemorySegment.h>
 #include <IOKit/IOMemoryDescriptor.h>
 
-class ItlSkywalkMemorySegment {
-public:
-    ItlSkywalkMemorySegment();
-    ~ItlSkywalkMemorySegment();
-    
-    // Initialize with optional IOMapper
-    bool init(void *mapper = nullptr);
-    void free();
-    
-    // Map virtual buffer to DMA address
-    bool mapBuffer(void *virtualAddress, uint32_t size, uint32_t &dmaAddress);
-    void unmapBuffer(uint32_t dmaAddress, uint32_t size);
-    
-    // Check if IOMapper is available
-    bool hasMapper() const { return mapper_ != nullptr; }
-    
+class ItlSkywalkMemorySegment : public IOSkywalkMemorySegment {
+    OSDeclareDefaultStructors(ItlSkywalkMemorySegment)
+
 private:
-    void *mapper_;
+    IOMemoryDescriptor *descriptor_;
+    uint32_t length_;
+
+public:
+    static ItlSkywalkMemorySegment *withDescriptor(IOMemoryDescriptor *descriptor);
+
+    virtual void free() APPLE_KEXT_OVERRIDE;
+
+    virtual void complete(uint32_t status) APPLE_KEXT_OVERRIDE;
+    virtual IOMemoryDescriptor *getMemoryDescriptor(void) APPLE_KEXT_OVERRIDE;
+    virtual uint32_t getLength(void) APPLE_KEXT_OVERRIDE;
 };
 
 #endif /* ItlSkywalkMemorySegment_hpp */

@@ -153,7 +153,12 @@ AirportItlwm/
     ItlSkywalkMemorySegment.{hpp,cpp}    IOMapper / bounce buffer
 ```
 
-**Status:** Not started; blocked on Phase 2.
+**Status:** Skeleton refactored to the 4-queue BCMC contract (TxSubmission/TxCompletion/
+RxSubmission/RxCompletion as IOSkywalkPacketQueue subclasses, pool subclassing
+IOSkywalkPacketBufferPool, segment subclassing IOSkywalkMemorySegment). All
+`skywalk/*.{hpp,cpp}` registered in itlwm.xcodeproj (targets AirportItlwm-Sonoma14.0
+and AirportItlwm-Sonoma14.4). Pending: compile on MacBook, then CONTRACT fingerprint
+to confirm vtable/order before real datapath wiring.
 
 ---
 
