@@ -4,6 +4,85 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT_DIR"
 
+if ! command -v xcodebuild >/dev/null 2>&1; then
+    echo "ОШИБКА: xcodebuild не найден; для сборки macOS нужен Xcode." >&2
+    exit 1
+fi
+
+if ! SDK_LIST="$(xcodebuild -showsdks 2>&1)"; then
+    echo "ОШИБКА: не удалось получить список установленных SDK через xcodebuild -showsdks:" >&2
+    printf '%s\n' "$SDK_LIST" >&2
+    exit 1
+fi
+
+sdkroot_for_major() {
+    local major="$1"
+    local sdkroot
+
+    sdkroot="$(printf '%s\n' "$SDK_LIST" | awk -v major="$major" '
+        {
+            for (i = 1; i < NF; i++) {
+                if ($i != "-sdk" || $(i + 1) !~ /^macosx[0-9]/) {
+                    continue
+                }
+
+                id = $(i + 1)
+                version = id
+                sub(/^macosx/, "", version)
+                parts = split(version, component, ".")
+                if (component[1] + 0 != major + 0) {
+                    continue
+                }
+
+                minor = parts > 1 ? component[2] + 0 : 0
+                patch = parts > 2 ? component[3] + 0 : 0
+                if (!found || minor > best_minor || (minor == best_minor && patch > best_patch)) {
+                    found = 1
+                    best_minor = minor
+                    best_patch = patch
+                    best_id = id
+                }
+            }
+        }
+        END {
+            if (found) {
+                print best_id
+            }
+        }
+    ')"
+
+    if [ -z "$sdkroot" ]; then
+        echo "ОШИБКА: не найден macOS ${major}.x SDK. Установленные SDK:" >&2
+        printf '%s\n' "$SDK_LIST" >&2
+        exit 1
+    fi
+
+    printf '%s' "$sdkroot"
+}
+
+SEQUOIA_SDKROOT="$(sdkroot_for_major 15)"
+TAHOE_SDKROOT="$(sdkroot_for_major 26)"
+
+check_sdkroot() {
+    local sdkroot="$1"
+    local sdk_version="${sdkroot#macosx}"
+    local sdk_info
+
+    if ! sdk_info="$(xcodebuild -version -sdk "$sdkroot" 2>&1)"; then
+        echo "ОШИБКА: SDKROOT=$sdkroot недоступен через xcodebuild:" >&2
+        printf '%s\n' "$sdk_info" >&2
+        exit 1
+    fi
+    if ! printf '%s\n' "$sdk_info" | grep -Fqx "SDKVersion: $sdk_version"; then
+        echo "ОШИБКА: xcodebuild не подтвердил SDK $sdkroot:" >&2
+        printf '%s\n' "$sdk_info" >&2
+        exit 1
+    fi
+}
+
+check_sdkroot "$SEQUOIA_SDKROOT"
+check_sdkroot "$TAHOE_SDKROOT"
+
 # Run through bash so the helper does not require the executable bit.
 bash scripts/setup_mackernelsdk.sh
 
@@ -30,25 +109,61 @@ build_airport_variant() {
     local target_macro="$2" # e.g. __MAC_26_0
     local deployment="$3"   # e.g. 26.0
     local infoplist="$4"
+    local sdkroot="$5"
 
     echo
     echo "========================================"
-    echo "Building AirportItlwm ${label} (__IO80211_TARGET=${target_macro})..."
+    echo "Building AirportItlwm ${label} (__IO80211_TARGET=${target_macro}, SDKROOT=${sdkroot})..."
     echo "========================================"
 
     xcodebuild \
         -project itlwm.xcodeproj \
         -target "AirportItlwm-Sonoma14.4" \
         -configuration Debug \
+        -sdk "$sdkroot" \
         CONFIGURATION_BUILD_DIR="$PRODUCTS/$label" \
         GCC_PREPROCESSOR_DEFINITIONS='$(inherited) AIRPORT __PRIVATE_SPI__ IO80211FAMILY_V2 __IO80211_TARGET='"$target_macro" \
         INFOPLIST_FILE="$infoplist" \
         MACOSX_DEPLOYMENT_TARGET="$deployment" \
+        SDKROOT="$sdkroot" \
         GIT_COMMIT=_local
 
     if [ -d "$PRODUCTS/$label/AirportItlwm.kext" ]; then
         rm -rf "$ROOT_DIR/AirportItlwm-$label.kext"
         cp -R "$PRODUCTS/$label/AirportItlwm.kext" "$ROOT_DIR/AirportItlwm-$label.kext"
+
+        if [[ "$sdkroot" =~ ^macosx[0-9] ]]; then
+            local expected_sdkroot="$sdkroot"
+            local bundle="$ROOT_DIR/AirportItlwm-$label.kext"
+            local plist="$bundle/Contents/Info.plist"
+            local executable="$bundle/Contents/MacOS/AirportItlwm"
+            local expected_major="${expected_sdkroot#macosx}"
+            local actual_sdk_major
+            local actual_platform_major
+            local actual_sdkroot
+            local actual_platform_version
+
+            expected_major="${expected_major%%.*}"
+            if [ ! -f "$executable" ]; then
+                echo "ОШИБКА: в bundle отсутствует executable $executable" >&2
+                exit 1
+            fi
+            if ! /usr/bin/plutil -lint "$plist" >/dev/null; then
+                echo "ОШИБКА: некорректный Info.plist: $plist" >&2
+                exit 1
+            fi
+            actual_sdkroot="$(/usr/libexec/PlistBuddy -c 'Print :DTSDKName' "$plist")"
+            actual_platform_version="$(/usr/libexec/PlistBuddy -c 'Print :DTPlatformVersion' "$plist")"
+            actual_sdk_major="${actual_sdkroot#macosx}"
+            actual_sdk_major="${actual_sdk_major%%.*}"
+            actual_platform_major="${actual_platform_version%%.*}"
+            if [ "$actual_sdk_major" != "$expected_major" ] || [ "$actual_platform_major" != "$expected_major" ]; then
+                echo "ОШИБКА: SDK metadata не совпадает с запрошенным SDKROOT=$expected_sdkroot:" >&2
+                echo "  DTSDKName=$actual_sdkroot, DTPlatformVersion=$actual_platform_version" >&2
+                exit 1
+            fi
+        fi
+
         echo "-> $ROOT_DIR/AirportItlwm-$label.kext"
     else
         echo "ОШИБКА: kext не собран ($PRODUCTS/$label/AirportItlwm.kext)" >&2
@@ -56,9 +171,9 @@ build_airport_variant() {
     fi
 }
 
-build_airport_variant "Sonoma14.4" "__MAC_14_4" "10.15" "AirportItlwm/AirportItlwm-Sonoma-Info.plist"
-build_airport_variant "Sequoia" "__MAC_15_0" "15.0" "AirportItlwm/AirportItlwm-Sequoia-Info.plist"
-build_airport_variant "Tahoe" "__MAC_26_0" "26.0" "AirportItlwm/AirportItlwm-Tahoe-Info.plist"
+build_airport_variant "Sonoma14.4" "__MAC_14_4" "10.15" "AirportItlwm/AirportItlwm-Sonoma-Info.plist" "macosx"
+build_airport_variant "Sequoia" "__MAC_15_0" "15.0" "AirportItlwm/AirportItlwm-Sequoia-Info.plist" "$SEQUOIA_SDKROOT"
+build_airport_variant "Tahoe" "__MAC_26_0" "26.0" "AirportItlwm/AirportItlwm-Tahoe-Info.plist" "$TAHOE_SDKROOT"
 
 echo
 echo "========================================"
