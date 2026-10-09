@@ -116,6 +116,11 @@ build_airport_variant() {
     echo "Building AirportItlwm ${label} (__IO80211_TARGET=${target_macro}, SDKROOT=${sdkroot})..."
     echo "========================================"
 
+    # Xcode 15+ defaults to Apple's new linker (ld-prime), which reorders and
+    # rewrites kext vtables. OpenCore's OCAK then reports
+    # "Vtable patching failed" and the injection fails with "Invalid Parameter".
+    # Forcing the classic ld64 linker keeps the vtable layout the kernel and
+    # OpenCore expect. (-ld_classic is still supported by Xcode 26.x.)
     xcodebuild \
         -project itlwm.xcodeproj \
         -target "AirportItlwm-Sonoma14.4" \
@@ -125,6 +130,7 @@ build_airport_variant() {
         GCC_PREPROCESSOR_DEFINITIONS='$(inherited) AIRPORT __PRIVATE_SPI__ IO80211FAMILY_V2 __IO80211_TARGET='"$target_macro" \
         INFOPLIST_FILE="$infoplist" \
         MACOSX_DEPLOYMENT_TARGET="$deployment" \
+        OTHER_LDFLAGS="-Wl,-ld_classic" \
         SDKROOT="$sdkroot" \
         GIT_COMMIT=_local
 
