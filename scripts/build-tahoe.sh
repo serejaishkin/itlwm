@@ -4,6 +4,15 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT_DIR"
 
+# Сборка не требует прав root, но под sudo кексты в корне репо становятся
+# root-владельца и ломают git pull/checkout ("Permission denied"). Предупреждаем
+# и после сборки возвращаем владельца (SUDO_USER).
+if [ "$(id -u)" -eq 0 ]; then
+    echo "Внимание: скрипт запущен через sudo. Сборка не требует прав root;" >&2
+    echo "запускайте без sudo: bash scripts/build-tahoe.sh" >&2
+    echo "Владелец собранных kext будет возвращён пользователю ${SUDO_USER:-root}." >&2
+fi
+
 if ! command -v xcodebuild >/dev/null 2>&1; then
     echo "ОШИБКА: xcodebuild не найден; для сборки macOS нужен Xcode." >&2
     exit 1
@@ -21,7 +30,11 @@ bash scripts/setup_mackernelsdk.sh
 DERIVED_DATA="$ROOT_DIR/build-tahoe"
 PRODUCTS="$DERIVED_DATA/Debug"
 
-rm -rf "$DERIVED_DATA"
+if ! rm -rf "$DERIVED_DATA"; then
+    echo "ОШИБКА: не удалось удалить $DERIVED_DATA — файлы принадлежат root от прошлого запуска под sudo." >&2
+    echo "Исправьте владельца и повторите: sudo chown -R \"\$(whoami)\":staff \"$DERIVED_DATA\"" >&2
+    exit 1
+fi
 
 # Native AirportItlwm-Sequoia / -Tahoe targets also exist in the project (for
 # Xcode GUI builds). This script still drives a single build path through the
@@ -71,6 +84,10 @@ build_airport_variant() {
     if [ -d "$PRODUCTS/$label/AirportItlwm.kext" ]; then
         rm -rf "$ROOT_DIR/AirportItlwm-$label.kext"
         cp -R "$PRODUCTS/$label/AirportItlwm.kext" "$ROOT_DIR/AirportItlwm-$label.kext"
+
+        if [ "$(id -u)" -eq 0 ] && [ -n "${SUDO_USER:-}" ]; then
+            chown -R "$SUDO_USER" "$ROOT_DIR/AirportItlwm-$label.kext"
+        fi
 
         if [[ "$sdkroot" =~ ^macosx[0-9] ]]; then
             local expected_sdkroot="$sdkroot"
