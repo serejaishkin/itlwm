@@ -9,79 +9,11 @@ if ! command -v xcodebuild >/dev/null 2>&1; then
     exit 1
 fi
 
-if ! SDK_LIST="$(xcodebuild -showsdks 2>&1)"; then
-    echo "ОШИБКА: не удалось получить список установленных SDK через xcodebuild -showsdks:" >&2
-    printf '%s\n' "$SDK_LIST" >&2
-    exit 1
-fi
-
-sdkroot_for_major() {
-    local major="$1"
-    local sdkroot
-
-    sdkroot="$(printf '%s\n' "$SDK_LIST" | awk -v major="$major" '
-        {
-            for (i = 1; i < NF; i++) {
-                if ($i != "-sdk" || $(i + 1) !~ /^macosx[0-9]/) {
-                    continue
-                }
-
-                id = $(i + 1)
-                version = id
-                sub(/^macosx/, "", version)
-                parts = split(version, component, ".")
-                if (component[1] + 0 != major + 0) {
-                    continue
-                }
-
-                minor = parts > 1 ? component[2] + 0 : 0
-                patch = parts > 2 ? component[3] + 0 : 0
-                if (!found || minor > best_minor || (minor == best_minor && patch > best_patch)) {
-                    found = 1
-                    best_minor = minor
-                    best_patch = patch
-                    best_id = id
-                }
-            }
-        }
-        END {
-            if (found) {
-                print best_id
-            }
-        }
-    ')"
-
-    if [ -z "$sdkroot" ]; then
-        echo "ОШИБКА: не найден macOS ${major}.x SDK. Установленные SDK:" >&2
-        printf '%s\n' "$SDK_LIST" >&2
-        exit 1
-    fi
-
-    printf '%s' "$sdkroot"
-}
-
-SEQUOIA_SDKROOT="$(sdkroot_for_major 15)"
-TAHOE_SDKROOT="$(sdkroot_for_major 26)"
-
-check_sdkroot() {
-    local sdkroot="$1"
-    local sdk_version="${sdkroot#macosx}"
-    local sdk_info
-
-    if ! sdk_info="$(xcodebuild -version -sdk "$sdkroot" 2>&1)"; then
-        echo "ОШИБКА: SDKROOT=$sdkroot недоступен через xcodebuild:" >&2
-        printf '%s\n' "$sdk_info" >&2
-        exit 1
-    fi
-    if ! printf '%s\n' "$sdk_info" | grep -Fqx "SDKVersion: $sdk_version"; then
-        echo "ОШИБКА: xcodebuild не подтвердил SDK $sdkroot:" >&2
-        printf '%s\n' "$sdk_info" >&2
-        exit 1
-    fi
-}
-
-check_sdkroot "$SEQUOIA_SDKROOT"
-check_sdkroot "$TAHOE_SDKROOT"
+# The AirportItlwm SPI/vtable contract is selected at compile time by
+# __IO80211_TARGET and the vendored headers under include/Airport (they branch
+# only on __IO80211_TARGET, never on the SDK version). The SDK therefore does
+# not affect the kext ABI: every variant is built against the default (newest)
+# installed macOS SDK, and only MACOSX_DEPLOYMENT_TARGET differs per variant.
 
 # Run through bash so the helper does not require the executable bit.
 bash scripts/setup_mackernelsdk.sh
@@ -91,10 +23,12 @@ PRODUCTS="$DERIVED_DATA/Debug"
 
 rm -rf "$DERIVED_DATA"
 
-# The project has no native Sequoia/Tahoe AirportItlwm targets yet, so the
-# Sonoma 14.4 source graph (AirportItlwmV2 + AirportItlwmSkywalkInterface,
-# gated on __IO80211_TARGET) is reused and the contract gate is switched via
-# GCC_PREPROCESSOR_DEFINITIONS on the command line.
+# Native AirportItlwm-Sequoia / -Tahoe targets also exist in the project (for
+# Xcode GUI builds). This script still drives a single build path through the
+# Sonoma 14.4 source graph (AirportItlwmV2 + AirportItlwmSkywalkInterface, gated
+# on __IO80211_TARGET) and switches the contract gate via
+# GCC_PREPROCESSOR_DEFINITIONS on the command line, so all three variants are
+# produced by one code path.
 #
 # NOTE: a CLI GCC_PREPROCESSOR_DEFINITIONS REPLACES the whole build setting,
 # so every define the target lists must be redeclared: AIRPORT, __PRIVATE_SPI__,
@@ -178,8 +112,8 @@ build_airport_variant() {
 }
 
 build_airport_variant "Sonoma14.4" "__MAC_14_4" "10.15" "AirportItlwm/AirportItlwm-Sonoma-Info.plist" "macosx"
-build_airport_variant "Sequoia" "__MAC_15_0" "15.0" "AirportItlwm/AirportItlwm-Sequoia-Info.plist" "$SEQUOIA_SDKROOT"
-build_airport_variant "Tahoe" "__MAC_26_0" "26.0" "AirportItlwm/AirportItlwm-Tahoe-Info.plist" "$TAHOE_SDKROOT"
+build_airport_variant "Sequoia" "__MAC_15_0" "15.0" "AirportItlwm/AirportItlwm-Sequoia-Info.plist" "macosx"
+build_airport_variant "Tahoe" "__MAC_26_0" "26.0" "AirportItlwm/AirportItlwm-Tahoe-Info.plist" "macosx"
 
 echo
 echo "========================================"

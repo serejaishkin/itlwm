@@ -4611,7 +4611,6 @@ DE47B1000000000000000001 /* skywalk */ = {
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				SDKROOT = macosx15.7;
 				MODULE_NAME = com.zxystd.AirportItlwm;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportItlwm;
 				PRODUCT_MODULE_NAME = AirportItlwm;
@@ -4644,7 +4643,6 @@ DE47B1000000000000000001 /* skywalk */ = {
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				SDKROOT = macosx26.2;
 				MODULE_NAME = com.zxystd.AirportItlwm;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportItlwm;
 				PRODUCT_MODULE_NAME = AirportItlwm;
@@ -4709,7 +4707,6 @@ DE47B1000000000000000001 /* skywalk */ = {
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				SDKROOT = macosx15.7;
 				MODULE_NAME = com.zxystd.AirportItlwm;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportItlwm;
 				PRODUCT_MODULE_NAME = AirportItlwm;
@@ -4742,7 +4739,6 @@ DE47B1000000000000000001 /* skywalk */ = {
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				SDKROOT = macosx26.2;
 				MODULE_NAME = com.zxystd.AirportItlwm;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportItlwm;
 				PRODUCT_MODULE_NAME = AirportItlwm;
