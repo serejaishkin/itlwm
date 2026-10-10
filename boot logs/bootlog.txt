@@ -1,7 +1,7 @@
 AAPL: #[EB.H.IS|!] Err(0xE) <- RT.GV boot-signature 7C436110-AB2A-4BBB-A880-FE41995C9F82
 AAPL: #[EB.H.IS|!] Err(0xE) <- RT.GV boot-image-key 7C436110-AB2A-4BBB-A880-FE41995C9F82
 AAPL: #[EB|H:IS] 0
-AAPL: #[EB|LOG:INIT] 2026-10-08T10:22:12
+AAPL: #[EB|LOG:INIT] 2026-10-10T14:52:11
 AAPL: #[EB|VERSION] <"boot.efi 583~2317 (Official), built 2025-07-20T20:18:15-0700">
 AAPL: #[EB|BUILD] <"BUILD-INFO[395]:{"DisplayName":"boot.efi","DisplayVersion":"583~2317","RecordUuid":"E04BD364-5411-4549-AD87-B55F5D90F8CD","BuildTime":"2025-07-20T20:18:15-0700","ProjectName":"efiboot","ProductName":"boot.efi","SourceVersion":"583","BuildVersion":"2317","BuildConfiguration":"Release","BuildType":"Official","Compiler":"clang-1700.0.13.5","SdkVersion":"15.7","SdkBuild":"24G201t","TargetArchitectures":"x86_64"}">
 AAPL: #[EB.CFG.DEV|!] Err(0xE) <- RT.GV booter-strict-xmlparser 7C436110-AB2A-4BBB-A880-FE41995C9F82
@@ -25,7 +25,6 @@ AAPL: #[EB|B:VAw]
 AAPL: #[EB|B:IAw]
 AAPL: #[EB|WL] 0 0 0x01 0x01   2 0x00
 AAPL: #[EB.BST.IDT|+]
-AAPL: #[EB|BM] J160AP
 AAPL: #[EB.BST.IDT|-]
 AAPL: #[EB|WL] 0 0 0x01 0x01   3 0x00
 AAPL: #[EB|WL] 0 0 0x01 0x01   4 0x00
@@ -41,8 +40,7 @@ AAPL: #[EB.H.LV|!] Err(0xE) <- RT.SV- boot-signature 7C436110-AB2A-4BBB-A880-FE4
 AAPL: #[EB.H.LV|!] Err(0xE) <- RT.SV- boot-image-key 7C436110-AB2A-4BBB-A880-FE41995C9F82
 AAPL: #[EB.H.LV|!] Err(0xE) <- RT.SV- boot-image 7C436110-AB2A-4BBB-A880-FE41995C9F82
 AAPL: #[EB|H:NOT]
-AAPL: #[EB|SB:P] 0x1
-AAPL: #[EB.B.MN|BM:+SB]
+AAPL: #[EB|SB:P] 0x0
 AAPL: #[EB|LIMG:DP] Acpi(PNP0A03,0)/Pci(2|1)/Pci(0|1)/SATA(0,FFFF)/HD(Part1,SigDAFC47C6-0803-4A05-AB2D-CD0D15CCF599)/VenMedia(BE74FCF7-0B7C-49F3-9147-01F4042E6842)
 AAPL: #[EB|LIMG:FP] \21C586CB-A122-4091-83EA-AEF6E531C2C0\System\Library\CoreServices\boot.efi
 AAPL: #[EB|LIMG:OPT] 
@@ -54,12 +52,12 @@ AAPL: #[EB.OPT.LXF|F] <"Library\\Preferences\\SystemConfiguration\\com.apple.Boo
 AAPL: #[EB.LD.LF|IN] 0 1 <"Library\\Preferences\\SystemConfiguration\\com.apple.Boot.plist"> <"0">
 AAPL: #[EB|KF] <"">
 AAPL: #[EB|MBA:CL] <"">
-AAPL: #[EB|MBA:NV] <"-v debug=0x100 keepsyms=1 npci=0x2000 agdpmod=vit9696 shikigva=128 unfairgva=4 -itlwmcontract slide=227">
+AAPL: #[EB|MBA:NV] <"-v debug=0x100 keepsyms=1 npci=0x2000 agdpmod=vit9696 shikigva=128 unfairgva=4 -itlwmcontract -amfipassbeta slide=220">
 AAPL: #[EB|MBA:KF] <"">
-AAPL: #[EB|MBA:OUT] <"-v debug=0x100 keepsyms=1 npci=0x2000 agdpmod=vit9696 shikigva=128 unfairgva=4 -itlwmcontract slide=227">
-AAPL: #[EB|LOG:VERBOSE] 2026-10-08T10:22:12
-AAPL: #[EB.CSR.S|VAR] 0x00000040
-AAPL: #[EB|OPT:BM] 0x280182
+AAPL: #[EB|MBA:OUT] <"-v debug=0x100 keepsyms=1 npci=0x2000 agdpmod=vit9696 shikigva=128 unfairgva=4 -itlwmcontract -amfipassbeta slide=220">
+AAPL: #[EB|LOG:VERBOSE] 2026-10-10T14:52:11
+AAPL: #[EB.CSR.S|VAR] 0x00000843
+AAPL: #[EB|OPT:BM] 0x80182
 AAPL: #[EB.OPT.LXF|F] <"\\21C586CB-A122-4091-83EA-AEF6E531C2C0\\System\\Library\\CoreServices\\PlatformSupport.plist">
 AAPL: #[EB.LD.LF|IN] 0 1 <"\\21C586CB-A122-4091-83EA-AEF6E531C2C0\\System\\Library\\CoreServices\\PlatformSupport.plist"> <"0">
 AAPL: #[EB|P:CPR] N
@@ -83,30 +81,23 @@ AAPL: #[EB.WL.DT|!] Err(0xE) <- EB.WL.PWLFNV
 AAPL: #[EB.WL.PWLFRTC|NONE]
 AAPL: #[EB.WL.DT|!] Err(0xE) <- EB.WL.PWLFRTC
 AAPL: #[EB.LD.LKC|D] <"boot\System\Library\KernelCollections\BootKernelExtensions.kc.development">
-AAPL: #[EB.LD.LF|IN] 0 1 <"boot\\System\\Library\\KernelCollections\\BootKernelExtensions.kc.development"> <"0">
 AAPL: #[EB.LD.OFS|OPEN!] Err(0xE) <"boot\\System\\Library\\KernelCollections\\BootKernelExtensions.kc.development">
 AAPL: #[EB.LD.LKC|R.2] <"boot\System\Library\KernelCollections\BootKernelExtensions.kc">
-AAPL: #[EB.LD.LF|IN] 0 1 <"boot\\System\\Library\\KernelCollections\\BootKernelExtensions.kc"> <"0">
-OC: Prelinked injection AirportItlwm-Sequoia.kext () - Invalid Parameter
-AAPL: #[EB|SB:P] 0x1
-AAPL: #[EB|SB:SBGMFNS] j160ap.im4m
-AAPL: #[EB|SB:MF] boot\\System\\Library\\KernelCollections\\BootKernelExtensions.kc.j160ap.im4m
-AAPL: #[EB.LD.LF|IN] 0 1 <"boot\\System\\Library\\KernelCollections\\BootKernelExtensions.kc.j160ap.im4m"> <"0">
-AAPL: #[EB|SB:MKRN]
+OC: Prelinked injection AirportItlwm-Sequoia.kext (V2.4.0) - Invalid Parameter
 AAPL: #[EB.LD.LKFS|-?] Ok(0)
 AAPL: #[EB.LD.LKC|-?] Ok(0)
 AAPL: #[EB|BST:REV1]
-AAPL: #[EB|CSR:OUT] 0x00000040
+AAPL: #[EB|CSR:OUT] 0x00000843
 AAPL: #[EB.BST.FBS|+]
 AAPL: #[EB.BST.FBS|ADSZ] 0
 AAPL: #[EB.BST.FBS|KSSZ] 0
-AAPL: #[EB|SB:SBGMFNS] j160ap.im4m
+AAPL: #[EB|SB:SBGMFNS] x86legacyap.im4m
 AAPL: #[EB|RH:PF] usr\standalone\OS.dmg.root_hash
-AAPL: #[EB|RH:MF] <"usr\\standalone\\OS.dmg.root_hash.j160ap.im4m">
+AAPL: #[EB|RH:MF] <"usr\\standalone\\OS.dmg.root_hash.x86legacyap.im4m">
 AAPL: #[EB.LD.LF|IN] 0 1 <"usr\\standalone\\OS.dmg.root_hash"> <"0">
-AAPL: #[EB.LD.LF|IN] 0 1 <"usr\\standalone\\OS.dmg.root_hash.j160ap.im4m"> <"0">
+AAPL: #[EB.LD.LF|IN] 0 1 <"usr\\standalone\\OS.dmg.root_hash.x86legacyap.im4m"> <"0">
 AAPL: #[EB.BST.FBS|RHPSZ] 229
-AAPL: #[EB.BST.FBS|RHMSZ] 3657
-AAPL: #[EB|LOG:DT] 2026-10-08T10:22:15
-AAPL: #[EB|LOG:EXITBS:START] 2026-10-08T10:22:15
+AAPL: #[EB.BST.FBS|RHMSZ] 3658
+AAPL: #[EB|LOG:DT] 2026-10-10T14:52:12
+AAPL: #[EB|LOG:EXITBS:START] 2026-10-10T14:52:12
 
